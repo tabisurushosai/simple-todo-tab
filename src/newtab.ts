@@ -2,25 +2,60 @@ const taskInput = document.getElementById('task-input') as HTMLInputElement;
 const addButton = document.getElementById('add-button') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
 
-interface AppState {
-    tasks: string[];
+interface Task {
+    text: string;
+    completed: boolean;
 }
 
-function renderTasks(tasks: string[]) {
+function renderTasks(tasks: Task[]) {
     taskList.innerHTML = '';
-    tasks.forEach((task) => {
+    tasks.forEach((task, index) => {
         const li = document.createElement('li');
-        li.textContent = task;
+        li.style.display = 'flex';
+        li.style.alignItems = 'center';
         li.style.padding = '8px';
         li.style.borderBottom = '1px solid #eee';
+        
+        if (task.completed) {
+            li.style.color = '#888';
+            li.style.textDecoration = 'line-through';
+        }
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.style.marginRight = '12px';
+        checkbox.addEventListener('change', () => {
+            toggleTask(index);
+        });
+
+        const span = document.createElement('span');
+        span.textContent = task.text;
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
         taskList.appendChild(li);
     });
 }
 
 function loadTasks() {
     chrome.storage.local.get(['tasks'], (result) => {
-        const tasks = (result.tasks as string[]) || [];
+        const rawTasks = (result.tasks as (string | Task)[]) || [];
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
         renderTasks(tasks);
+    });
+}
+
+function toggleTask(index: number) {
+    chrome.storage.local.get(['tasks'], (result) => {
+        const rawTasks = (result.tasks as (string | Task)[]) || [];
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        if (tasks[index]) {
+            tasks[index].completed = !tasks[index].completed;
+            chrome.storage.local.set({ tasks }, () => {
+                renderTasks(tasks);
+            });
+        }
     });
 }
 
@@ -29,8 +64,9 @@ function addTask() {
     if (!text) return;
 
     chrome.storage.local.get(['tasks'], (result) => {
-        const tasks = (result.tasks as string[]) || [];
-        const newTasks = [...tasks, text];
+        const rawTasks = (result.tasks as (string | Task)[]) || [];
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        const newTasks: Task[] = [...tasks, { text, completed: false }];
         chrome.storage.local.set({ tasks: newTasks }, () => {
             taskInput.value = '';
             renderTasks(newTasks);
