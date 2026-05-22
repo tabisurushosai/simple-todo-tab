@@ -1,0 +1,13 @@
+# simple-todo-tab TODO (細粒度)
+- [ ] T001: newtab.html/src/newtab.ts に「今日のやること」見出し+入力欄+追加ボタンを作り、タスク文字列をchrome.storage.localの配列に保存して一覧表示するだけ。build通ればコミット
+- [ ] T002: 各タスクにチェックボックスを付け、完了/未完了をトグルしてstorageに反映、完了は薄く表示
+- [ ] T003: 各タスクに削除ボタンを付けstorageから削除
+- [ ] T004: タスクを上/下に並べ替えるボタンを付けstorageの順序を更新
+- [ ] T005: 「いま集中する1つ」を選び最上部に特大表示する機能
+- [ ] T006: 日付が変わったら未完了は翌日繰越・完了はリセットするロジック
+- [ ] T007: 起動時にstorage.localから全状態を復元
+- [ ] T008: _locales ja/en を chrome.i18n で全UIに適用
+- [ ] T009: Premiumゲート(trial_start_ts+Stripe Checkout URL)。無料は基本動作、Premiumで背景テーマ追加・完了履歴
+- [ ] T010: npm run build を通しts/lint解消
+- [ ] T011: release/simple-todo-tab.zip 生成(node_modules除外)
+- [ ] T012: legal/PRIVACY.md と TERMS.md(外部通信なし・データ収集なし明記)
