@@ -1,1 +1,18 @@
-<!doctype html><html><head><meta charset="utf-8"></head><body style="font-family:system-ui;padding:40px"><div id="app">…</div><script type="module" src="/src/newtab.ts"></script></body></html>
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>simple-todo-tab</title>
+</head>
+<body style="font-family: system-ui; padding: 40px; background-color: #f0f2f5;">
+    <div id="app" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h1 id="title">今日のやること</h1>
+        <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+            <input type="text" id="task-input" placeholder="なにする？" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <button id="add-button" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">追加</button>
+        </div>
+        <ul id="task-list" style="list-style: none; padding: 0;"></ul>
+    </div>
+    <script type="module" src="/src/newtab.ts"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 # simple-todo-tab TODO (細粒度)
-- [ ] T001: newtab.html/src/newtab.ts に「今日のやること」見出し+入力欄+追加ボタンを作り、タスク文字列をchrome.storage.localの配列に保存して一覧表示するだけ。build通ればコミット
+- [x] T001: newtab.html/src/newtab.ts に「今日のやること」見出し+入力欄+追加ボタンを作り、タスク文字列をchrome.storage.localの配列に保存して一覧表示するだけ。build通ればコミット
 - [ ] T002: 各タスクにチェックボックスを付け、完了/未完了をトグルしてstorageに反映、完了は薄く表示
 - [ ] T003: 各タスクに削除ボタンを付けstorageから削除
 - [ ] T004: タスクを上/下に並べ替えるボタンを付けstorageの順序を更新
