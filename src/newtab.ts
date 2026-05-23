@@ -193,4 +193,11 @@ taskInput.addEventListener('keypress', (e) => {
     }
 });
 
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && (changes.tasks || changes.last_date)) {
+        loadTasks();
+    }
+});
+
 loadTasks();
+taskInput.focus();
