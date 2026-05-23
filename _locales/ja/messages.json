@@ -1,1 +1,9 @@
-{ "extName":{"message":"きょうのことだけ"},"extDesc":{"message":"新しいタブに今日のやることだけを大きく表示。今やる一つに集中。ADHDの方に。"} }
+{
+  "extName": { "message": "きょうのことだけ" },
+  "extDesc": { "message": "新しいタブに今日のやることだけを大きく表示。今やる一つに集中。ADHDの方に。" },
+  "title": { "message": "今日のやること" },
+  "focusLabel": { "message": "いま集中すること" },
+  "inputPlaceholder": { "message": "なにする？" },
+  "addButton": { "message": "追加" },
+  "deleteButton": { "message": "削除" }
+}

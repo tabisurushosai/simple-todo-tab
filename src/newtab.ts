@@ -4,6 +4,17 @@ const taskList = document.getElementById('task-list') as HTMLUListElement;
 const focusContainer = document.getElementById('focus-container') as HTMLDivElement;
 const focusText = document.getElementById('focus-text') as HTMLDivElement;
 
+function setupI18n() {
+    const title = document.getElementById('title');
+    if (title) title.textContent = chrome.i18n.getMessage('title');
+    
+    const focusLabel = document.getElementById('focus-label');
+    if (focusLabel) focusLabel.textContent = chrome.i18n.getMessage('focusLabel');
+    
+    if (taskInput) taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
+    if (addButton) addButton.textContent = chrome.i18n.getMessage('addButton');
+}
+
 interface Task {
     text: string;
     completed: boolean;
@@ -67,7 +78,7 @@ function renderTasks(tasks: Task[]) {
         moveDownButton.addEventListener('click', () => moveTask(index, 1));
 
         const deleteButton = document.createElement('button');
-        deleteButton.textContent = '削除';
+        deleteButton.textContent = chrome.i18n.getMessage('deleteButton');
         deleteButton.style.marginLeft = '12px';
         deleteButton.style.padding = '4px 8px';
         deleteButton.style.fontSize = '12px';
@@ -199,5 +210,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
+setupI18n();
 loadTasks();
 taskInput.focus();

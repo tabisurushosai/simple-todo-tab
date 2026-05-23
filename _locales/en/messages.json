@@ -1,1 +1,9 @@
-{ "extName":{"message":"Just Today"},"extDesc":{"message":"Shows only todays tasks, big, on every new tab."} }
+{
+  "extName": { "message": "Just Today" },
+  "extDesc": { "message": "Shows only todays tasks, big, on every new tab." },
+  "title": { "message": "Today's Tasks" },
+  "focusLabel": { "message": "Focusing on" },
+  "inputPlaceholder": { "message": "What to do?" },
+  "addButton": { "message": "Add" },
+  "deleteButton": { "message": "Delete" }
+}
