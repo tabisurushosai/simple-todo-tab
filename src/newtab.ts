@@ -1,14 +1,25 @@
 const taskInput = document.getElementById('task-input') as HTMLInputElement;
 const addButton = document.getElementById('add-button') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
+const focusContainer = document.getElementById('focus-container') as HTMLDivElement;
+const focusText = document.getElementById('focus-text') as HTMLDivElement;
 
 interface Task {
     text: string;
     completed: boolean;
+    focused?: boolean;
 }
 
 function renderTasks(tasks: Task[]) {
     taskList.innerHTML = '';
+    const focusedTask = tasks.find(t => t.focused);
+    if (focusedTask && !focusedTask.completed) {
+        focusContainer.style.display = 'block';
+        focusText.textContent = focusedTask.text;
+    } else {
+        focusContainer.style.display = 'none';
+    }
+
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.style.display = 'flex';
@@ -32,6 +43,16 @@ function renderTasks(tasks: Task[]) {
         const span = document.createElement('span');
         span.textContent = task.text;
         span.style.flex = '1';
+
+        const focusButton = document.createElement('button');
+        focusButton.textContent = task.focused ? '★' : '☆';
+        focusButton.style.marginLeft = '8px';
+        focusButton.style.cursor = 'pointer';
+        focusButton.style.border = 'none';
+        focusButton.style.background = 'transparent';
+        focusButton.style.fontSize = '18px';
+        focusButton.style.color = task.focused ? '#ffc107' : '#ccc';
+        focusButton.addEventListener('click', () => toggleFocus(index));
 
         const moveUpButton = document.createElement('button');
         moveUpButton.textContent = '↑';
@@ -61,6 +82,7 @@ function renderTasks(tasks: Task[]) {
 
         li.appendChild(checkbox);
         li.appendChild(span);
+        li.appendChild(focusButton);
         li.appendChild(moveUpButton);
         li.appendChild(moveDownButton);
         li.appendChild(deleteButton);
@@ -71,7 +93,7 @@ function renderTasks(tasks: Task[]) {
 function loadTasks() {
     chrome.storage.local.get(['tasks'], (result) => {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
         renderTasks(tasks);
     });
 }
@@ -79,7 +101,7 @@ function loadTasks() {
 function moveTask(index: number, direction: number) {
     chrome.storage.local.get(['tasks'], (result) => {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
         const newIndex = index + direction;
         if (newIndex >= 0 && newIndex < tasks.length) {
             const [movedTask] = tasks.splice(index, 1);
@@ -94,7 +116,7 @@ function moveTask(index: number, direction: number) {
 function deleteTask(index: number) {
     chrome.storage.local.get(['tasks'], (result) => {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
         tasks.splice(index, 1);
         chrome.storage.local.set({ tasks }, () => {
             renderTasks(tasks);
@@ -105,9 +127,24 @@ function deleteTask(index: number) {
 function toggleTask(index: number) {
     chrome.storage.local.get(['tasks'], (result) => {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
         if (tasks[index]) {
             tasks[index].completed = !tasks[index].completed;
+            chrome.storage.local.set({ tasks }, () => {
+                renderTasks(tasks);
+            });
+        }
+    });
+}
+
+function toggleFocus(index: number) {
+    chrome.storage.local.get(['tasks'], (result) => {
+        const rawTasks = (result.tasks as (string | Task)[]) || [];
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
+        if (tasks[index]) {
+            const currentFocus = tasks[index].focused;
+            tasks.forEach(t => t.focused = false);
+            tasks[index].focused = !currentFocus;
             chrome.storage.local.set({ tasks }, () => {
                 renderTasks(tasks);
             });
@@ -121,8 +158,8 @@ function addTask() {
 
     chrome.storage.local.get(['tasks'], (result) => {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
-        const newTasks: Task[] = [...tasks, { text, completed: false }];
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
+        const newTasks: Task[] = [...tasks, { text, completed: false, focused: false }];
         chrome.storage.local.set({ tasks: newTasks }, () => {
             taskInput.value = '';
             renderTasks(newTasks);
