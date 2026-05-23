@@ -10,7 +10,7 @@ import {
     type HistoryItem,
     type Task,
 } from './core/tasks';
-import { chromeTodoStorage } from './storage/todoStorage';
+import { chromeTodoStorage } from './storage/chromeTodoStorage';
 
 type TaskFocusControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete' | 'item';
 type PendingFocusTarget =
@@ -361,7 +361,7 @@ themeColorInput.addEventListener('change', () => {
     });
 });
 
-chromeTodoStorage.onChanged((changes) => {
+chromeTodoStorage.subscribe((changes) => {
     if (changes.tasks || changes.last_date || changes.is_premium || changes.theme) {
         void loadTasks();
     }
