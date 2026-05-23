@@ -10,4 +10,4 @@
 - [x] T009: Premiumゲート(trial_start_ts+Stripe Checkout URL)。無料は基本動作、Premiumで背景テーマ追加・完了履歴
 - [x] T010: npm run build を通しts/lint解消
 - [x] T011: release/simple-todo-tab.zip 生成(node_modules除外)
-- [ ] T012: legal/PRIVACY.md と TERMS.md(外部通信なし・データ収集なし明記)
+- [x] T012: legal/PRIVACY.md と TERMS.md(外部通信なし・データ収集なし明記)
