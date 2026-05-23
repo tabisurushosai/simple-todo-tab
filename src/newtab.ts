@@ -1,3 +1,17 @@
+import {
+    createTask,
+    deleteTaskAt,
+    getTodayString,
+    moveTaskInList,
+    normalizeTasks,
+    removeCompletedTasks,
+    toggleTaskCompletion,
+    toggleTaskFocus,
+    type HistoryItem,
+    type Task,
+} from './core/tasks';
+import { chromeTodoStorage } from './storage/todoStorage';
+
 const taskInput = document.getElementById('task-input') as HTMLInputElement;
 const addButton = document.getElementById('add-button') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
@@ -27,17 +41,6 @@ function setupI18n() {
     const historyTitle = document.getElementById('history-title');
     if (historyTitle) historyTitle.textContent = chrome.i18n.getMessage('historyTitle');
     if (premiumStatus) premiumStatus.textContent = chrome.i18n.getMessage('premiumActive');
-}
-
-interface HistoryItem {
-    text: string;
-    completed_at: number;
-}
-
-interface Task {
-    text: string;
-    completed: boolean;
-    focused?: boolean;
 }
 
 function renderHistory(history: HistoryItem[]) {
@@ -93,7 +96,7 @@ function renderTasks(tasks: Task[]) {
         checkbox.checked = task.completed;
         checkbox.style.marginRight = '12px';
         checkbox.addEventListener('change', () => {
-            toggleTask(index);
+            void toggleTask(index);
         });
 
         const span = document.createElement('span');
@@ -108,19 +111,25 @@ function renderTasks(tasks: Task[]) {
         focusButton.style.background = 'transparent';
         focusButton.style.fontSize = '18px';
         focusButton.style.color = task.focused ? '#ffc107' : '#ccc';
-        focusButton.addEventListener('click', () => toggleFocus(index));
+        focusButton.addEventListener('click', () => {
+            void toggleFocus(index);
+        });
 
         const moveUpButton = document.createElement('button');
         moveUpButton.textContent = '↑';
         moveUpButton.style.marginLeft = '8px';
         moveUpButton.disabled = index === 0;
-        moveUpButton.addEventListener('click', () => moveTask(index, -1));
+        moveUpButton.addEventListener('click', () => {
+            void moveTask(index, -1);
+        });
 
         const moveDownButton = document.createElement('button');
         moveDownButton.textContent = '↓';
         moveDownButton.style.marginLeft = '4px';
         moveDownButton.disabled = index === tasks.length - 1;
-        moveDownButton.addEventListener('click', () => moveTask(index, 1));
+        moveDownButton.addEventListener('click', () => {
+            void moveTask(index, 1);
+        });
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = chrome.i18n.getMessage('deleteButton');
@@ -133,7 +142,7 @@ function renderTasks(tasks: Task[]) {
         deleteButton.style.borderRadius = '4px';
         deleteButton.style.cursor = 'pointer';
         deleteButton.addEventListener('click', () => {
-            deleteTask(index);
+            void deleteTask(index);
         });
 
         li.appendChild(checkbox);
@@ -146,148 +155,122 @@ function renderTasks(tasks: Task[]) {
     });
 }
 
-function getTodayString(): string {
-    const d = new Date();
-    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+async function loadTasks() {
+    const result = await chromeTodoStorage.get(['tasks', 'last_date', 'trial_start_ts', 'is_premium', 'history', 'theme']);
+    const today = getTodayString();
+    const lastDate = result.last_date;
+    let trialStartTs = result.trial_start_ts;
+    const isPremium = !!result.is_premium;
+    const history = result.history || [];
+    const theme = result.theme || '#f0f2f5';
+
+    if (!trialStartTs) {
+        trialStartTs = Date.now();
+        void chromeTodoStorage.set({ trial_start_ts: trialStartTs });
+    }
+
+    document.body.style.backgroundColor = theme;
+    themeColorInput.value = theme;
+    updatePremiumUI(isPremium, trialStartTs);
+    if (isPremium) {
+        renderHistory(history);
+    }
+
+    let tasks = normalizeTasks(result.tasks);
+
+    if (lastDate && lastDate !== today) {
+        // Date changed: carry over incomplete, reset completed
+        tasks = removeCompletedTasks(tasks);
+        await chromeTodoStorage.set({ tasks, last_date: today });
+        renderTasks(tasks);
+    } else {
+        if (!lastDate) {
+            void chromeTodoStorage.set({ last_date: today });
+        }
+        renderTasks(tasks);
+    }
 }
 
-function loadTasks() {
-    chrome.storage.local.get(['tasks', 'last_date', 'trial_start_ts', 'is_premium', 'history', 'theme'], (result) => {
-        const today = getTodayString();
-        const lastDate = result.last_date as string | undefined;
-        let trialStartTs = result.trial_start_ts as number | undefined;
-        const isPremium = !!result.is_premium;
-        const history = (result.history as HistoryItem[]) || [];
-        const theme = result.theme as string || '#f0f2f5';
-
-        if (!trialStartTs) {
-            trialStartTs = Date.now();
-            chrome.storage.local.set({ trial_start_ts: trialStartTs });
-        }
-
-        document.body.style.backgroundColor = theme;
-        themeColorInput.value = theme;
-        updatePremiumUI(isPremium, trialStartTs);
-        if (isPremium) {
-            renderHistory(history);
-        }
-
-        let rawTasks = (result.tasks as (string | Task)[]) || [];
-        let tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-
-        if (lastDate && lastDate !== today) {
-            // Date changed: carry over incomplete, reset completed
-            tasks = tasks.filter(t => !t.completed);
-            chrome.storage.local.set({ tasks, last_date: today }, () => {
-                renderTasks(tasks);
-            });
-        } else {
-            if (!lastDate) {
-                chrome.storage.local.set({ last_date: today });
-            }
-            renderTasks(tasks);
-        }
-    });
+async function moveTask(index: number, direction: number) {
+    const result = await chromeTodoStorage.get(['tasks']);
+    const tasks = normalizeTasks(result.tasks);
+    const newTasks = moveTaskInList(tasks, index, direction);
+    if (newTasks) {
+        await chromeTodoStorage.set({ tasks: newTasks });
+        renderTasks(newTasks);
+    }
 }
 
-function moveTask(index: number, direction: number) {
-    chrome.storage.local.get(['tasks'], (result) => {
-        const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-        const newIndex = index + direction;
-        if (newIndex >= 0 && newIndex < tasks.length) {
-            const [movedTask] = tasks.splice(index, 1);
-            tasks.splice(newIndex, 0, movedTask);
-            chrome.storage.local.set({ tasks }, () => {
-                renderTasks(tasks);
-            });
-        }
-    });
+async function deleteTask(index: number) {
+    const result = await chromeTodoStorage.get(['tasks']);
+    const tasks = normalizeTasks(result.tasks);
+    const newTasks = deleteTaskAt(tasks, index);
+    await chromeTodoStorage.set({ tasks: newTasks });
+    renderTasks(newTasks);
 }
 
-function deleteTask(index: number) {
-    chrome.storage.local.get(['tasks'], (result) => {
-        const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-        tasks.splice(index, 1);
-        chrome.storage.local.set({ tasks }, () => {
-            renderTasks(tasks);
-        });
-    });
+async function toggleTask(index: number) {
+    const result = await chromeTodoStorage.get(['tasks', 'is_premium', 'history']);
+    const tasks = normalizeTasks(result.tasks);
+    const isPremium = !!result.is_premium;
+    const history = result.history || [];
+    const toggled = toggleTaskCompletion(tasks, index);
+
+    if (toggled) {
+        const newHistory = toggled.completedTask && isPremium
+            ? [...history, { text: toggled.completedTask.text, completed_at: Date.now() }]
+            : history;
+
+        await chromeTodoStorage.set({ tasks: toggled.tasks, history: newHistory.slice(-100) });
+        renderTasks(toggled.tasks);
+        if (isPremium) renderHistory(newHistory);
+    }
 }
 
-function toggleTask(index: number) {
-    chrome.storage.local.get(['tasks', 'is_premium', 'history'], (result) => {
-        const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-        const isPremium = !!result.is_premium;
-        const history = (result.history as HistoryItem[]) || [];
-
-        if (tasks[index]) {
-            tasks[index].completed = !tasks[index].completed;
-            if (tasks[index].completed && isPremium) {
-                history.push({ text: tasks[index].text, completed_at: Date.now() });
-            }
-            chrome.storage.local.set({ tasks, history: history.slice(-100) }, () => {
-                renderTasks(tasks);
-                if (isPremium) renderHistory(history);
-            });
-        }
-    });
+async function toggleFocus(index: number) {
+    const result = await chromeTodoStorage.get(['tasks']);
+    const tasks = normalizeTasks(result.tasks);
+    const newTasks = toggleTaskFocus(tasks, index);
+    if (newTasks) {
+        await chromeTodoStorage.set({ tasks: newTasks });
+        renderTasks(newTasks);
+    }
 }
 
-function toggleFocus(index: number) {
-    chrome.storage.local.get(['tasks'], (result) => {
-        const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-        if (tasks[index]) {
-            const currentFocus = tasks[index].focused;
-            tasks.forEach(t => t.focused = false);
-            tasks[index].focused = !currentFocus;
-            chrome.storage.local.set({ tasks }, () => {
-                renderTasks(tasks);
-            });
-        }
-    });
-}
-
-function addTask() {
+async function addTask() {
     const text = taskInput.value.trim();
     if (!text) return;
 
-    chrome.storage.local.get(['tasks'], (result) => {
-        const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-        const newTasks: Task[] = [...tasks, { text, completed: false, focused: false }];
-        chrome.storage.local.set({ tasks: newTasks }, () => {
-            taskInput.value = '';
-            renderTasks(newTasks);
-        });
-    });
+    const result = await chromeTodoStorage.get(['tasks']);
+    const tasks = normalizeTasks(result.tasks);
+    const newTasks: Task[] = [...tasks, createTask(text)];
+    await chromeTodoStorage.set({ tasks: newTasks });
+    taskInput.value = '';
+    renderTasks(newTasks);
 }
 
-addButton.addEventListener('click', addTask);
+addButton.addEventListener('click', () => {
+    void addTask();
+});
 taskInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-        addTask();
+        void addTask();
     }
 });
 
 themeColorInput.addEventListener('change', () => {
     const theme = themeColorInput.value;
-    chrome.storage.local.set({ theme }, () => {
+    void chromeTodoStorage.set({ theme }).then(() => {
         document.body.style.backgroundColor = theme;
     });
 });
 
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local') {
-        if (changes.tasks || changes.last_date || changes.is_premium || changes.theme) {
-            loadTasks();
-        }
+chromeTodoStorage.onChanged((changes) => {
+    if (changes.tasks || changes.last_date || changes.is_premium || changes.theme) {
+        void loadTasks();
     }
 });
 
 setupI18n();
-loadTasks();
+void loadTasks();
 taskInput.focus();
