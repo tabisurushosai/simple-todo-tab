@@ -9,35 +9,28 @@ export interface TodoStorageValues {
     theme?: string;
 }
 
+export const TODO_STORAGE_KEYS = [
+    'tasks',
+    'last_date',
+    'trial_start_ts',
+    'is_premium',
+    'history',
+    'theme',
+] as const;
+
 export type TodoStorageKey = keyof TodoStorageValues;
-export type TodoStorageChanges = Partial<Record<TodoStorageKey, { oldValue?: unknown; newValue?: unknown }>>;
+export interface TodoStorageChange<T = unknown> {
+    oldValue?: T;
+    newValue?: T;
+}
+export type TodoStorageChanges = {
+    [K in TodoStorageKey]?: TodoStorageChange<TodoStorageValues[K]>;
+};
+export type TodoStorageChangeListener = (changes: TodoStorageChanges) => void;
+export type TodoStorageUnsubscribe = () => void;
 
 export interface TodoStorage {
-    get<K extends TodoStorageKey>(keys: K[]): Promise<Pick<TodoStorageValues, K>>;
+    get<K extends TodoStorageKey>(keys: readonly K[]): Promise<Pick<TodoStorageValues, K>>;
     set(values: Partial<TodoStorageValues>): Promise<void>;
-    onChanged(listener: (changes: TodoStorageChanges) => void): void;
+    subscribe(listener: TodoStorageChangeListener): TodoStorageUnsubscribe;
 }
-
-export const chromeTodoStorage: TodoStorage = {
-    get(keys) {
-        return new Promise(resolve => {
-            chrome.storage.local.get(keys, result => {
-                resolve(result as Pick<TodoStorageValues, typeof keys[number]>);
-            });
-        });
-    },
-    set(values) {
-        return new Promise(resolve => {
-            chrome.storage.local.set(values, () => {
-                resolve();
-            });
-        });
-    },
-    onChanged(listener) {
-        chrome.storage.onChanged.addListener((changes, area) => {
-            if (area === 'local') {
-                listener(changes as TodoStorageChanges);
-            }
-        });
-    },
-};
