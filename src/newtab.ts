@@ -90,11 +90,30 @@ function renderTasks(tasks: Task[]) {
     });
 }
 
+function getTodayString(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
 function loadTasks() {
-    chrome.storage.local.get(['tasks'], (result) => {
-        const rawTasks = (result.tasks as (string | Task)[]) || [];
-        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
-        renderTasks(tasks);
+    chrome.storage.local.get(['tasks', 'last_date'], (result) => {
+        const today = getTodayString();
+        const lastDate = result.last_date as string | undefined;
+        let rawTasks = (result.tasks as (string | Task)[]) || [];
+        let tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
+
+        if (lastDate && lastDate !== today) {
+            // Date changed: carry over incomplete, reset completed
+            tasks = tasks.filter(t => !t.completed);
+            chrome.storage.local.set({ tasks, last_date: today }, () => {
+                renderTasks(tasks);
+            });
+        } else {
+            if (!lastDate) {
+                chrome.storage.local.set({ last_date: today });
+            }
+            renderTasks(tasks);
+        }
     });
 }
 
