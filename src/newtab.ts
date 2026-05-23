@@ -15,6 +15,7 @@ import { chromeTodoStorage } from './storage/todoStorage';
 const taskInput = document.getElementById('task-input') as HTMLInputElement;
 const addButton = document.getElementById('add-button') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
+const taskStatus = document.getElementById('task-status') as HTMLDivElement;
 const focusContainer = document.getElementById('focus-container') as HTMLDivElement;
 const focusText = document.getElementById('focus-text') as HTMLDivElement;
 const premiumGate = document.getElementById('premium-gate') as HTMLDivElement;
@@ -24,6 +25,7 @@ const premiumFeatures = document.getElementById('premium-features') as HTMLDivEl
 const premiumStatus = document.getElementById('premium-status') as HTMLDivElement;
 const themeColorInput = document.getElementById('theme-color') as HTMLInputElement;
 const historyList = document.getElementById('history-list') as HTMLUListElement;
+const historyStatus = document.getElementById('history-status') as HTMLDivElement;
 
 function setupI18n() {
     const title = document.getElementById('title');
@@ -38,19 +40,27 @@ function setupI18n() {
     if (upgradeLink) upgradeLink.textContent = chrome.i18n.getMessage('upgradeButton');
     const themeLabel = document.getElementById('theme-label');
     if (themeLabel) themeLabel.textContent = chrome.i18n.getMessage('themeLabel');
+    if (themeColorInput) themeColorInput.setAttribute('aria-label', chrome.i18n.getMessage('themeLabel'));
     const historyTitle = document.getElementById('history-title');
     if (historyTitle) historyTitle.textContent = chrome.i18n.getMessage('historyTitle');
     if (premiumStatus) premiumStatus.textContent = chrome.i18n.getMessage('premiumActive');
+    if (taskStatus) taskStatus.textContent = chrome.i18n.getMessage('loadingTasks');
 }
 
 function renderHistory(history: HistoryItem[]) {
     historyList.innerHTML = '';
+    if (history.length === 0) {
+        historyStatus.hidden = false;
+        historyStatus.textContent = chrome.i18n.getMessage('historyEmpty');
+        return;
+    }
+
+    historyStatus.hidden = true;
     history.slice(-20).reverse().forEach(item => {
         const li = document.createElement('li');
         const date = new Date(item.completed_at).toLocaleTimeString();
         li.textContent = `${date}: ${item.text}`;
-        li.style.borderBottom = '1px solid #f0f0f0';
-        li.style.padding = '2px 0';
+        li.className = 'history-item';
         historyList.appendChild(li);
     });
 }
@@ -69,8 +79,26 @@ function updatePremiumUI(isPremium: boolean, trialStartTs: number) {
     }
 }
 
+function setTaskStatus(tasks: Task[]) {
+    if (tasks.length === 0) {
+        taskStatus.textContent = chrome.i18n.getMessage('emptyTasks');
+        return;
+    }
+
+    const remaining = tasks.filter(task => !task.completed).length;
+    if (remaining === 0) {
+        taskStatus.textContent = chrome.i18n.getMessage('allTasksComplete');
+        return;
+    }
+
+    taskStatus.textContent = chrome.i18n.getMessage('tasksRemainingStatus')
+        .replace('$ACTIVE$', remaining.toString())
+        .replace('$TOTAL$', tasks.length.toString());
+}
+
 function renderTasks(tasks: Task[]) {
     taskList.innerHTML = '';
+    setTaskStatus(tasks);
     const focusedTask = tasks.find(t => t.focused);
     if (focusedTask && !focusedTask.completed) {
         focusContainer.style.display = 'block';
@@ -81,66 +109,56 @@ function renderTasks(tasks: Task[]) {
 
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
-        li.style.display = 'flex';
-        li.style.alignItems = 'center';
-        li.style.padding = '8px';
-        li.style.borderBottom = '1px solid #eee';
-        
-        if (task.completed) {
-            li.style.color = '#888';
-            li.style.textDecoration = 'line-through';
-        }
+        li.className = `task-item${task.completed ? ' task-item--completed' : ''}`;
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = task.completed;
-        checkbox.style.marginRight = '12px';
+        checkbox.className = 'task-checkbox';
         checkbox.addEventListener('change', () => {
             void toggleTask(index);
         });
 
         const span = document.createElement('span');
         span.textContent = task.text;
-        span.style.flex = '1';
+        span.className = 'task-text';
 
         const focusButton = document.createElement('button');
+        focusButton.type = 'button';
         focusButton.textContent = task.focused ? '★' : '☆';
-        focusButton.style.marginLeft = '8px';
-        focusButton.style.cursor = 'pointer';
-        focusButton.style.border = 'none';
-        focusButton.style.background = 'transparent';
-        focusButton.style.fontSize = '18px';
-        focusButton.style.color = task.focused ? '#ffc107' : '#ccc';
+        focusButton.className = `icon-button focus-button${task.focused ? ' focus-button--active' : ''}`;
+        focusButton.setAttribute(
+            'aria-label',
+            chrome.i18n.getMessage(task.focused ? 'clearFocusTaskButton' : 'focusTaskButton'),
+        );
         focusButton.addEventListener('click', () => {
             void toggleFocus(index);
         });
 
         const moveUpButton = document.createElement('button');
+        moveUpButton.type = 'button';
         moveUpButton.textContent = '↑';
-        moveUpButton.style.marginLeft = '8px';
+        moveUpButton.className = 'task-action-button';
+        moveUpButton.setAttribute('aria-label', chrome.i18n.getMessage('moveTaskUp'));
         moveUpButton.disabled = index === 0;
         moveUpButton.addEventListener('click', () => {
             void moveTask(index, -1);
         });
 
         const moveDownButton = document.createElement('button');
+        moveDownButton.type = 'button';
         moveDownButton.textContent = '↓';
-        moveDownButton.style.marginLeft = '4px';
+        moveDownButton.className = 'task-action-button';
+        moveDownButton.setAttribute('aria-label', chrome.i18n.getMessage('moveTaskDown'));
         moveDownButton.disabled = index === tasks.length - 1;
         moveDownButton.addEventListener('click', () => {
             void moveTask(index, 1);
         });
 
         const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
         deleteButton.textContent = chrome.i18n.getMessage('deleteButton');
-        deleteButton.style.marginLeft = '12px';
-        deleteButton.style.padding = '4px 8px';
-        deleteButton.style.fontSize = '12px';
-        deleteButton.style.color = '#dc3545';
-        deleteButton.style.border = '1px solid #dc3545';
-        deleteButton.style.backgroundColor = 'transparent';
-        deleteButton.style.borderRadius = '4px';
-        deleteButton.style.cursor = 'pointer';
+        deleteButton.className = 'delete-button';
         deleteButton.addEventListener('click', () => {
             void deleteTask(index);
         });
