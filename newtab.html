@@ -11,18 +11,19 @@
         <section class="todo-card" aria-labelledby="title">
             <h1 id="title" class="app-title">今日のやること</h1>
 
-            <div id="focus-container" class="focus-panel">
+            <div id="focus-container" class="focus-panel" role="status" aria-live="polite">
                 <div id="focus-label" class="focus-label">いま集中すること</div>
                 <div id="focus-text" class="focus-text"></div>
             </div>
 
-            <div class="task-entry">
-                <input type="text" id="task-input" class="task-input" placeholder="なにする？">
-                <button id="add-button" class="add-button" type="button">追加</button>
-            </div>
+            <form id="task-entry" class="task-entry" aria-describedby="task-status">
+                <label id="task-input-label" class="visually-hidden" for="task-input">今日やること</label>
+                <input type="text" id="task-input" class="task-input" placeholder="なにする？" autocomplete="off" aria-labelledby="task-input-label">
+                <button id="add-button" class="add-button" type="submit" aria-controls="task-list">追加</button>
+            </form>
 
             <div id="task-status" class="status-message" role="status" aria-live="polite">読み込み中...</div>
-            <ul id="task-list" class="task-list"></ul>
+            <ul id="task-list" class="task-list" aria-describedby="task-status"></ul>
 
             <hr class="section-divider">
 
@@ -38,7 +39,7 @@
                         <label for="theme-color" id="theme-label">Background Color</label>
                         <input type="color" id="theme-color" value="#f0f2f5" aria-label="Background Color">
                     </div>
-                    <div id="history-container" class="history-container">
+                    <div id="history-container" class="history-container" role="region" aria-labelledby="history-title">
                         <div class="history-title" id="history-title">Completion History</div>
                         <div id="history-status" class="history-status" aria-live="polite"></div>
                         <ul id="history-list" class="history-list"></ul>
