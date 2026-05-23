@@ -2,39 +2,52 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>simple-todo-tab</title>
+    <link rel="stylesheet" href="/src/newtab.css">
 </head>
-<body style="font-family: system-ui; padding: 40px; background-color: #f0f2f5;">
-    <div id="app" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h1 id="title">今日のやること</h1>
-        <div id="focus-container" style="display: none; margin-bottom: 24px; padding: 24px; background: #e7f3ff; border-radius: 8px; text-align: center;">
-            <div id="focus-label" style="font-size: 14px; color: #666; margin-bottom: 8px;">いま集中すること</div>
-            <div id="focus-text" style="font-size: 32px; font-weight: bold; color: #007bff;"></div>
-        </div>
-        <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-            <input type="text" id="task-input" placeholder="なにする？" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-            <button id="add-button" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">追加</button>
-        </div>
-        <ul id="task-list" style="list-style: none; padding: 0;"></ul>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-        <div id="premium-section" style="font-size: 14px; color: #666;">
-            <div id="premium-gate" style="display: none; background: #fff3cd; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
-                <span id="gate-message"></span>
-                <a id="upgrade-link" href="https://checkout.stripe.com/c/dummy" target="_blank" style="display: block; margin-top: 8px; color: #856404; font-weight: bold; text-decoration: none; border: 1px solid #856404; padding: 4px 8px; border-radius: 4px; text-align: center;">Upgrade</a>
+<body>
+    <main id="app" class="app-shell">
+        <section class="todo-card" aria-labelledby="title">
+            <h1 id="title" class="app-title">今日のやること</h1>
+
+            <div id="focus-container" class="focus-panel">
+                <div id="focus-label" class="focus-label">いま集中すること</div>
+                <div id="focus-text" class="focus-text"></div>
             </div>
-            <div id="premium-features" style="display: none;">
-                <div style="font-weight: bold; margin-bottom: 8px;" id="premium-status">Premium Active</div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                    <label for="theme-color" id="theme-label">Background Color</label>
-                    <input type="color" id="theme-color" value="#f0f2f5">
+
+            <div class="task-entry">
+                <input type="text" id="task-input" class="task-input" placeholder="なにする？">
+                <button id="add-button" class="add-button" type="button">追加</button>
+            </div>
+
+            <div id="task-status" class="status-message" role="status" aria-live="polite">読み込み中...</div>
+            <ul id="task-list" class="task-list"></ul>
+
+            <hr class="section-divider">
+
+            <div id="premium-section" class="premium-section">
+                <div id="premium-gate" class="premium-gate">
+                    <span id="gate-message"></span>
+                    <a id="upgrade-link" class="upgrade-link" href="https://checkout.stripe.com/c/dummy" target="_blank">Upgrade</a>
                 </div>
-                <div id="history-container">
-                    <div style="font-weight: bold; margin-bottom: 4px;" id="history-title">Completion History</div>
-                    <ul id="history-list" style="list-style: none; padding: 0; font-size: 12px; max-height: 100px; overflow-y: auto;"></ul>
+
+                <div id="premium-features" class="premium-features">
+                    <div class="premium-status" id="premium-status">Premium Active</div>
+                    <div class="theme-row">
+                        <label for="theme-color" id="theme-label">Background Color</label>
+                        <input type="color" id="theme-color" value="#f0f2f5" aria-label="Background Color">
+                    </div>
+                    <div id="history-container" class="history-container">
+                        <div class="history-title" id="history-title">Completion History</div>
+                        <div id="history-status" class="history-status" aria-live="polite"></div>
+                        <ul id="history-list" class="history-list"></ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
+
     <script type="module" src="/src/newtab.ts"></script>
 </body>
 </html>

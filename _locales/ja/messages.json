@@ -6,9 +6,18 @@
   "inputPlaceholder": { "message": "なにする？" },
   "addButton": { "message": "追加" },
   "deleteButton": { "message": "削除" },
+  "loadingTasks": { "message": "読み込み中..." },
+  "emptyTasks": { "message": "まだタスクはありません。今日やることを1つ追加しましょう。" },
+  "allTasksComplete": { "message": "今日のタスクはすべて完了しました。おつかれさまです。" },
+  "tasksRemainingStatus": { "message": "未完了 $ACTIVE$ 件 / 全 $TOTAL$ 件" },
+  "focusTaskButton": { "message": "集中タスクにする" },
+  "clearFocusTaskButton": { "message": "集中を外す" },
+  "moveTaskUp": { "message": "上へ移動" },
+  "moveTaskDown": { "message": "下へ移動" },
   "premiumGate": { "message": "試用期間終了まであと$DAYS$日。プレミアム加入で背景変更と履歴機能が解放されます。" },
   "upgradeButton": { "message": "プレミアムにアップグレード" },
   "themeLabel": { "message": "背景色" },
   "historyTitle": { "message": "完了履歴" },
+  "historyEmpty": { "message": "完了履歴はまだありません。" },
   "premiumActive": { "message": "プレミアム有効" }
 }

@@ -6,9 +6,18 @@
   "inputPlaceholder": { "message": "What to do?" },
   "addButton": { "message": "Add" },
   "deleteButton": { "message": "Delete" },
+  "loadingTasks": { "message": "Loading tasks..." },
+  "emptyTasks": { "message": "No tasks yet. Add one thing to do today." },
+  "allTasksComplete": { "message": "All of today's tasks are complete. Nice work." },
+  "tasksRemainingStatus": { "message": "$ACTIVE$ remaining / $TOTAL$ total" },
+  "focusTaskButton": { "message": "Set as focus task" },
+  "clearFocusTaskButton": { "message": "Clear focus task" },
+  "moveTaskUp": { "message": "Move up" },
+  "moveTaskDown": { "message": "Move down" },
   "premiumGate": { "message": "Trial expires in $DAYS$ days. Upgrade to Premium for themes and history!" },
   "upgradeButton": { "message": "Upgrade to Premium" },
   "themeLabel": { "message": "Background Color" },
   "historyTitle": { "message": "Completion History" },
+  "historyEmpty": { "message": "No completion history yet." },
   "premiumActive": { "message": "Premium Active" }
 }
