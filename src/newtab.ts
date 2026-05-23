@@ -18,6 +18,7 @@ type PendingFocusTarget =
     | { type: 'input' };
 
 let pendingFocusTarget: PendingFocusTarget | null = null;
+type SupportedLocale = 'ja' | 'en';
 
 const taskEntryForm = document.getElementById('task-entry') as HTMLFormElement;
 const taskInputLabel = document.getElementById('task-input-label') as HTMLLabelElement;
@@ -36,7 +37,35 @@ const themeColorInput = document.getElementById('theme-color') as HTMLInputEleme
 const historyList = document.getElementById('history-list') as HTMLUListElement;
 const historyStatus = document.getElementById('history-status') as HTMLDivElement;
 
+function getSupportedLocale(): SupportedLocale {
+    const uiLocale = chrome.i18n.getMessage('@@ui_locale') || chrome.i18n.getUILanguage();
+    return uiLocale.toLowerCase().startsWith('en') ? 'en' : 'ja';
+}
+
+const supportedLocale = getSupportedLocale();
+const numberFormatter = new Intl.NumberFormat(supportedLocale);
+const historyDateFormatter = new Intl.DateTimeFormat(supportedLocale, {
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+});
+
+function formatNumber(value: number): string {
+    return numberFormatter.format(value);
+}
+
+function i18nMessage(messageName: string, replacements: Record<string, string> = {}): string {
+    return Object.entries(replacements).reduce(
+        (message, [key, value]) => message.replace(`$${key}$`, value),
+        chrome.i18n.getMessage(messageName),
+    );
+}
+
 function setupI18n() {
+    document.documentElement.lang = supportedLocale;
+    document.title = chrome.i18n.getMessage('title');
+
     const title = document.getElementById('title');
     if (title) title.textContent = chrome.i18n.getMessage('title');
     
@@ -58,7 +87,7 @@ function setupI18n() {
 }
 
 function taskMessage(messageName: string, taskText: string): string {
-    return chrome.i18n.getMessage(messageName).replace('$TASK$', taskText);
+    return i18nMessage(messageName, { TASK: taskText });
 }
 
 function queueTaskFocus(control: TaskFocusControl, index: number) {
@@ -110,8 +139,8 @@ function renderHistory(history: HistoryItem[]) {
     historyStatus.hidden = true;
     history.slice(-20).reverse().forEach(item => {
         const li = document.createElement('li');
-        const date = new Date(item.completed_at).toLocaleTimeString();
-        li.textContent = `${date}: ${item.text}`;
+        const date = historyDateFormatter.format(new Date(item.completed_at));
+        li.textContent = i18nMessage('historyItem', { DATE: date, TASK: item.text });
         li.className = 'history-item';
         historyList.appendChild(li);
     });
@@ -127,7 +156,10 @@ function updatePremiumUI(isPremium: boolean, trialStartTs: number) {
         const trialDays = 7;
         const elapsed = Date.now() - trialStartTs;
         const remaining = Math.max(0, Math.ceil((trialDays * 24 * 60 * 60 * 1000 - elapsed) / (24 * 60 * 60 * 1000)));
-        gateMessage.textContent = chrome.i18n.getMessage('premiumGate').replace('$DAYS$', remaining.toString());
+        gateMessage.textContent = i18nMessage(
+            remaining === 1 ? 'premiumGateOneDay' : 'premiumGate',
+            { DAYS: formatNumber(remaining) },
+        );
     }
 }
 
@@ -144,8 +176,8 @@ function setTaskStatus(tasks: Task[]) {
     }
 
     taskStatus.textContent = chrome.i18n.getMessage('tasksRemainingStatus')
-        .replace('$ACTIVE$', remaining.toString())
-        .replace('$TOTAL$', tasks.length.toString());
+        .replace('$ACTIVE$', formatNumber(remaining))
+        .replace('$TOTAL$', formatNumber(tasks.length));
 }
 
 function renderTasks(tasks: Task[]) {
