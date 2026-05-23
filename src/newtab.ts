@@ -12,6 +12,15 @@ import {
 } from './core/tasks';
 import { chromeTodoStorage } from './storage/todoStorage';
 
+type TaskFocusControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete' | 'item';
+type PendingFocusTarget =
+    | { type: 'task'; control: TaskFocusControl; index: number }
+    | { type: 'input' };
+
+let pendingFocusTarget: PendingFocusTarget | null = null;
+
+const taskEntryForm = document.getElementById('task-entry') as HTMLFormElement;
+const taskInputLabel = document.getElementById('task-input-label') as HTMLLabelElement;
 const taskInput = document.getElementById('task-input') as HTMLInputElement;
 const addButton = document.getElementById('add-button') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
@@ -34,6 +43,7 @@ function setupI18n() {
     const focusLabel = document.getElementById('focus-label');
     if (focusLabel) focusLabel.textContent = chrome.i18n.getMessage('focusLabel');
     
+    if (taskInputLabel) taskInputLabel.textContent = chrome.i18n.getMessage('taskInputLabel');
     if (taskInput) taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
     if (addButton) addButton.textContent = chrome.i18n.getMessage('addButton');
 
@@ -45,6 +55,48 @@ function setupI18n() {
     if (historyTitle) historyTitle.textContent = chrome.i18n.getMessage('historyTitle');
     if (premiumStatus) premiumStatus.textContent = chrome.i18n.getMessage('premiumActive');
     if (taskStatus) taskStatus.textContent = chrome.i18n.getMessage('loadingTasks');
+}
+
+function taskMessage(messageName: string, taskText: string): string {
+    return chrome.i18n.getMessage(messageName).replace('$TASK$', taskText);
+}
+
+function queueTaskFocus(control: TaskFocusControl, index: number) {
+    pendingFocusTarget = { type: 'task', control, index };
+}
+
+function queueInputFocus() {
+    pendingFocusTarget = { type: 'input' };
+}
+
+function focusPendingTarget() {
+    if (!pendingFocusTarget) return;
+
+    const target = pendingFocusTarget;
+    pendingFocusTarget = null;
+
+    if (target.type === 'input') {
+        taskInput.focus({ preventScroll: true });
+        return;
+    }
+
+    const selectors = target.control === 'item'
+        ? [`li[data-task-index="${target.index}"]`]
+        : [
+            `[data-task-control="${target.control}"][data-task-index="${target.index}"]`,
+            `li[data-task-index="${target.index}"]`,
+        ];
+
+    for (const selector of selectors) {
+        const element = taskList.querySelector<HTMLElement>(selector);
+        if (!element) continue;
+        if ('disabled' in element && element.disabled) continue;
+
+        element.focus({ preventScroll: true });
+        return;
+    }
+
+    taskInput.focus({ preventScroll: true });
 }
 
 function renderHistory(history: HistoryItem[]) {
@@ -110,14 +162,23 @@ function renderTasks(tasks: Task[]) {
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.className = `task-item${task.completed ? ' task-item--completed' : ''}`;
+        li.tabIndex = -1;
+        li.setAttribute('data-task-index', index.toString());
 
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.className = 'task-checkbox-target';
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = task.completed;
         checkbox.className = 'task-checkbox';
+        checkbox.setAttribute('aria-label', taskMessage(task.completed ? 'markTaskIncomplete' : 'markTaskComplete', task.text));
+        checkbox.setAttribute('data-task-control', 'checkbox');
+        checkbox.setAttribute('data-task-index', index.toString());
         checkbox.addEventListener('change', () => {
+            queueTaskFocus('checkbox', index);
             void toggleTask(index);
         });
+        checkboxLabel.appendChild(checkbox);
 
         const span = document.createElement('span');
         span.textContent = task.text;
@@ -127,11 +188,15 @@ function renderTasks(tasks: Task[]) {
         focusButton.type = 'button';
         focusButton.textContent = task.focused ? '★' : '☆';
         focusButton.className = `icon-button focus-button${task.focused ? ' focus-button--active' : ''}`;
+        focusButton.setAttribute('aria-pressed', (!!task.focused).toString());
         focusButton.setAttribute(
             'aria-label',
-            chrome.i18n.getMessage(task.focused ? 'clearFocusTaskButton' : 'focusTaskButton'),
+            taskMessage(task.focused ? 'clearFocusTaskButtonForTask' : 'focusTaskButtonForTask', task.text),
         );
+        focusButton.setAttribute('data-task-control', 'focus');
+        focusButton.setAttribute('data-task-index', index.toString());
         focusButton.addEventListener('click', () => {
+            queueTaskFocus('focus', index);
             void toggleFocus(index);
         });
 
@@ -139,9 +204,12 @@ function renderTasks(tasks: Task[]) {
         moveUpButton.type = 'button';
         moveUpButton.textContent = '↑';
         moveUpButton.className = 'task-action-button';
-        moveUpButton.setAttribute('aria-label', chrome.i18n.getMessage('moveTaskUp'));
+        moveUpButton.setAttribute('aria-label', taskMessage('moveTaskUpForTask', task.text));
+        moveUpButton.setAttribute('data-task-control', 'move-up');
+        moveUpButton.setAttribute('data-task-index', index.toString());
         moveUpButton.disabled = index === 0;
         moveUpButton.addEventListener('click', () => {
+            queueTaskFocus('item', index - 1);
             void moveTask(index, -1);
         });
 
@@ -149,9 +217,12 @@ function renderTasks(tasks: Task[]) {
         moveDownButton.type = 'button';
         moveDownButton.textContent = '↓';
         moveDownButton.className = 'task-action-button';
-        moveDownButton.setAttribute('aria-label', chrome.i18n.getMessage('moveTaskDown'));
+        moveDownButton.setAttribute('aria-label', taskMessage('moveTaskDownForTask', task.text));
+        moveDownButton.setAttribute('data-task-control', 'move-down');
+        moveDownButton.setAttribute('data-task-index', index.toString());
         moveDownButton.disabled = index === tasks.length - 1;
         moveDownButton.addEventListener('click', () => {
+            queueTaskFocus('item', index + 1);
             void moveTask(index, 1);
         });
 
@@ -159,11 +230,20 @@ function renderTasks(tasks: Task[]) {
         deleteButton.type = 'button';
         deleteButton.textContent = chrome.i18n.getMessage('deleteButton');
         deleteButton.className = 'delete-button';
+        deleteButton.setAttribute('aria-label', taskMessage('deleteTaskButtonForTask', task.text));
+        deleteButton.setAttribute('data-task-control', 'delete');
+        deleteButton.setAttribute('data-task-index', index.toString());
         deleteButton.addEventListener('click', () => {
+            const nextIndex = Math.min(index, tasks.length - 2);
+            if (nextIndex >= 0) {
+                queueTaskFocus('item', nextIndex);
+            } else {
+                queueInputFocus();
+            }
             void deleteTask(index);
         });
 
-        li.appendChild(checkbox);
+        li.appendChild(checkboxLabel);
         li.appendChild(span);
         li.appendChild(focusButton);
         li.appendChild(moveUpButton);
@@ -171,6 +251,8 @@ function renderTasks(tasks: Task[]) {
         li.appendChild(deleteButton);
         taskList.appendChild(li);
     });
+
+    focusPendingTarget();
 }
 
 async function loadTasks() {
@@ -267,13 +349,9 @@ async function addTask() {
     renderTasks(newTasks);
 }
 
-addButton.addEventListener('click', () => {
+taskEntryForm.addEventListener('submit', (event) => {
+    event.preventDefault();
     void addTask();
-});
-taskInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        void addTask();
-    }
 });
 
 themeColorInput.addEventListener('change', () => {
