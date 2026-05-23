@@ -1,10 +1,10 @@
 {
   "extName": { "message": "Just Today" },
-  "extDesc": { "message": "Shows only todays tasks, big, on every new tab." },
-  "title": { "message": "Today's Tasks" },
-  "focusLabel": { "message": "Focusing on" },
-  "taskInputLabel": { "message": "Task to add today" },
-  "inputPlaceholder": { "message": "What to do?" },
+  "extDesc": { "message": "Shows only today's tasks in every new tab so you can focus on one thing now." },
+  "title": { "message": "Today's tasks" },
+  "focusLabel": { "message": "Focus task" },
+  "taskInputLabel": { "message": "Task for today" },
+  "inputPlaceholder": { "message": "What needs doing?" },
   "addButton": { "message": "Add" },
   "deleteButton": { "message": "Delete" },
   "loadingTasks": { "message": "Loading tasks..." },
@@ -22,10 +22,12 @@
   "moveTaskUpForTask": { "message": "Move up: $TASK$" },
   "moveTaskDownForTask": { "message": "Move down: $TASK$" },
   "deleteTaskButtonForTask": { "message": "Delete: $TASK$" },
-  "premiumGate": { "message": "Trial expires in $DAYS$ days. Upgrade to Premium for themes and history!" },
+  "premiumGate": { "message": "Trial ends in $DAYS$ days. Upgrade to Premium to use background color and completion history." },
+  "premiumGateOneDay": { "message": "Trial ends in $DAYS$ day. Upgrade to Premium to use background color and completion history." },
   "upgradeButton": { "message": "Upgrade to Premium" },
-  "themeLabel": { "message": "Background Color" },
-  "historyTitle": { "message": "Completion History" },
+  "themeLabel": { "message": "Background color" },
+  "historyTitle": { "message": "Completion history" },
   "historyEmpty": { "message": "No completion history yet." },
-  "premiumActive": { "message": "Premium Active" }
+  "historyItem": { "message": "$DATE$: $TASK$" },
+  "premiumActive": { "message": "Premium active" }
 }
