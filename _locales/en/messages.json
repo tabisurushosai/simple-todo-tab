@@ -5,5 +5,10 @@
   "focusLabel": { "message": "Focusing on" },
   "inputPlaceholder": { "message": "What to do?" },
   "addButton": { "message": "Add" },
-  "deleteButton": { "message": "Delete" }
+  "deleteButton": { "message": "Delete" },
+  "premiumGate": { "message": "Trial expires in $DAYS$ days. Upgrade to Premium for themes and history!" },
+  "upgradeButton": { "message": "Upgrade to Premium" },
+  "themeLabel": { "message": "Background Color" },
+  "historyTitle": { "message": "Completion History" },
+  "premiumActive": { "message": "Premium Active" }
 }

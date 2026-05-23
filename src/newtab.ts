@@ -3,6 +3,13 @@ const addButton = document.getElementById('add-button') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
 const focusContainer = document.getElementById('focus-container') as HTMLDivElement;
 const focusText = document.getElementById('focus-text') as HTMLDivElement;
+const premiumGate = document.getElementById('premium-gate') as HTMLDivElement;
+const gateMessage = document.getElementById('gate-message') as HTMLSpanElement;
+const upgradeLink = document.getElementById('upgrade-link') as HTMLAnchorElement;
+const premiumFeatures = document.getElementById('premium-features') as HTMLDivElement;
+const premiumStatus = document.getElementById('premium-status') as HTMLDivElement;
+const themeColorInput = document.getElementById('theme-color') as HTMLInputElement;
+const historyList = document.getElementById('history-list') as HTMLUListElement;
 
 function setupI18n() {
     const title = document.getElementById('title');
@@ -13,12 +20,50 @@ function setupI18n() {
     
     if (taskInput) taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
     if (addButton) addButton.textContent = chrome.i18n.getMessage('addButton');
+
+    if (upgradeLink) upgradeLink.textContent = chrome.i18n.getMessage('upgradeButton');
+    const themeLabel = document.getElementById('theme-label');
+    if (themeLabel) themeLabel.textContent = chrome.i18n.getMessage('themeLabel');
+    const historyTitle = document.getElementById('history-title');
+    if (historyTitle) historyTitle.textContent = chrome.i18n.getMessage('historyTitle');
+    if (premiumStatus) premiumStatus.textContent = chrome.i18n.getMessage('premiumActive');
+}
+
+interface HistoryItem {
+    text: string;
+    completed_at: number;
 }
 
 interface Task {
     text: string;
     completed: boolean;
     focused?: boolean;
+}
+
+function renderHistory(history: HistoryItem[]) {
+    historyList.innerHTML = '';
+    history.slice(-20).reverse().forEach(item => {
+        const li = document.createElement('li');
+        const date = new Date(item.completed_at).toLocaleTimeString();
+        li.textContent = `${date}: ${item.text}`;
+        li.style.borderBottom = '1px solid #f0f0f0';
+        li.style.padding = '2px 0';
+        historyList.appendChild(li);
+    });
+}
+
+function updatePremiumUI(isPremium: boolean, trialStartTs: number) {
+    if (isPremium) {
+        premiumGate.style.display = 'none';
+        premiumFeatures.style.display = 'block';
+    } else {
+        premiumFeatures.style.display = 'none';
+        premiumGate.style.display = 'block';
+        const trialDays = 7;
+        const elapsed = Date.now() - trialStartTs;
+        const remaining = Math.max(0, Math.ceil((trialDays * 24 * 60 * 60 * 1000 - elapsed) / (24 * 60 * 60 * 1000)));
+        gateMessage.textContent = chrome.i18n.getMessage('premiumGate').replace('$DAYS$', remaining.toString());
+    }
 }
 
 function renderTasks(tasks: Task[]) {
@@ -107,9 +152,26 @@ function getTodayString(): string {
 }
 
 function loadTasks() {
-    chrome.storage.local.get(['tasks', 'last_date'], (result) => {
+    chrome.storage.local.get(['tasks', 'last_date', 'trial_start_ts', 'is_premium', 'history', 'theme'], (result) => {
         const today = getTodayString();
         const lastDate = result.last_date as string | undefined;
+        let trialStartTs = result.trial_start_ts as number | undefined;
+        const isPremium = !!result.is_premium;
+        const history = (result.history as HistoryItem[]) || [];
+        const theme = result.theme as string || '#f0f2f5';
+
+        if (!trialStartTs) {
+            trialStartTs = Date.now();
+            chrome.storage.local.set({ trial_start_ts: trialStartTs });
+        }
+
+        document.body.style.backgroundColor = theme;
+        themeColorInput.value = theme;
+        updatePremiumUI(isPremium, trialStartTs);
+        if (isPremium) {
+            renderHistory(history);
+        }
+
         let rawTasks = (result.tasks as (string | Task)[]) || [];
         let tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
 
@@ -155,13 +217,20 @@ function deleteTask(index: number) {
 }
 
 function toggleTask(index: number) {
-    chrome.storage.local.get(['tasks'], (result) => {
+    chrome.storage.local.get(['tasks', 'is_premium', 'history'], (result) => {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
         const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false, focused: false } : { focused: false, ...t });
+        const isPremium = !!result.is_premium;
+        const history = (result.history as HistoryItem[]) || [];
+
         if (tasks[index]) {
             tasks[index].completed = !tasks[index].completed;
-            chrome.storage.local.set({ tasks }, () => {
+            if (tasks[index].completed && isPremium) {
+                history.push({ text: tasks[index].text, completed_at: Date.now() });
+            }
+            chrome.storage.local.set({ tasks, history: history.slice(-100) }, () => {
                 renderTasks(tasks);
+                if (isPremium) renderHistory(history);
             });
         }
     });
@@ -204,9 +273,18 @@ taskInput.addEventListener('keypress', (e) => {
     }
 });
 
+themeColorInput.addEventListener('change', () => {
+    const theme = themeColorInput.value;
+    chrome.storage.local.set({ theme }, () => {
+        document.body.style.backgroundColor = theme;
+    });
+});
+
 chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes.tasks || changes.last_date)) {
-        loadTasks();
+    if (area === 'local') {
+        if (changes.tasks || changes.last_date || changes.is_premium || changes.theme) {
+            loadTasks();
+        }
     }
 });
 

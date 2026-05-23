@@ -16,6 +16,24 @@
             <button id="add-button" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">追加</button>
         </div>
         <ul id="task-list" style="list-style: none; padding: 0;"></ul>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <div id="premium-section" style="font-size: 14px; color: #666;">
+            <div id="premium-gate" style="display: none; background: #fff3cd; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                <span id="gate-message"></span>
+                <a id="upgrade-link" href="https://checkout.stripe.com/c/dummy" target="_blank" style="display: block; margin-top: 8px; color: #856404; font-weight: bold; text-decoration: none; border: 1px solid #856404; padding: 4px 8px; border-radius: 4px; text-align: center;">Upgrade</a>
+            </div>
+            <div id="premium-features" style="display: none;">
+                <div style="font-weight: bold; margin-bottom: 8px;" id="premium-status">Premium Active</div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <label for="theme-color" id="theme-label">Background Color</label>
+                    <input type="color" id="theme-color" value="#f0f2f5">
+                </div>
+                <div id="history-container">
+                    <div style="font-weight: bold; margin-bottom: 4px;" id="history-title">Completion History</div>
+                    <ul id="history-list" style="list-style: none; padding: 0; font-size: 12px; max-height: 100px; overflow-y: auto;"></ul>
+                </div>
+            </div>
+        </div>
     </div>
     <script type="module" src="/src/newtab.ts"></script>
 </body>

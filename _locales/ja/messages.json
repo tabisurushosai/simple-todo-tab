@@ -5,5 +5,10 @@
   "focusLabel": { "message": "いま集中すること" },
   "inputPlaceholder": { "message": "なにする？" },
   "addButton": { "message": "追加" },
-  "deleteButton": { "message": "削除" }
+  "deleteButton": { "message": "削除" },
+  "premiumGate": { "message": "試用期間終了まであと$DAYS$日。プレミアム加入で背景変更と履歴機能が解放されます。" },
+  "upgradeButton": { "message": "プレミアムにアップグレード" },
+  "themeLabel": { "message": "背景色" },
+  "historyTitle": { "message": "完了履歴" },
+  "premiumActive": { "message": "プレミアム有効" }
 }
