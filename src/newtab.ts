@@ -33,6 +33,18 @@ function renderTasks(tasks: Task[]) {
         span.textContent = task.text;
         span.style.flex = '1';
 
+        const moveUpButton = document.createElement('button');
+        moveUpButton.textContent = '↑';
+        moveUpButton.style.marginLeft = '8px';
+        moveUpButton.disabled = index === 0;
+        moveUpButton.addEventListener('click', () => moveTask(index, -1));
+
+        const moveDownButton = document.createElement('button');
+        moveDownButton.textContent = '↓';
+        moveDownButton.style.marginLeft = '4px';
+        moveDownButton.disabled = index === tasks.length - 1;
+        moveDownButton.addEventListener('click', () => moveTask(index, 1));
+
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
         deleteButton.style.marginLeft = '12px';
@@ -49,6 +61,8 @@ function renderTasks(tasks: Task[]) {
 
         li.appendChild(checkbox);
         li.appendChild(span);
+        li.appendChild(moveUpButton);
+        li.appendChild(moveDownButton);
         li.appendChild(deleteButton);
         taskList.appendChild(li);
     });
@@ -59,6 +73,21 @@ function loadTasks() {
         const rawTasks = (result.tasks as (string | Task)[]) || [];
         const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
         renderTasks(tasks);
+    });
+}
+
+function moveTask(index: number, direction: number) {
+    chrome.storage.local.get(['tasks'], (result) => {
+        const rawTasks = (result.tasks as (string | Task)[]) || [];
+        const tasks: Task[] = rawTasks.map(t => typeof t === 'string' ? { text: t, completed: false } : t);
+        const newIndex = index + direction;
+        if (newIndex >= 0 && newIndex < tasks.length) {
+            const [movedTask] = tasks.splice(index, 1);
+            tasks.splice(newIndex, 0, movedTask);
+            chrome.storage.local.set({ tasks }, () => {
+                renderTasks(tasks);
+            });
+        }
     });
 }
 
