@@ -16,16 +16,20 @@
                 <div id="focus-text" class="focus-text"></div>
             </div>
 
-            <form id="task-entry" class="task-entry" aria-describedby="task-status">
+            <form id="task-entry" class="task-entry" aria-describedby="onboarding-guide task-status">
                 <label id="task-input-label" class="visually-hidden" for="task-input">今日やることを入力</label>
                 <input type="text" id="task-input" class="task-input" placeholder="何をしますか？" autocomplete="off" aria-labelledby="task-input-label">
                 <button id="add-button" class="add-button" type="submit" aria-controls="task-list">追加</button>
             </form>
 
-            <div id="onboarding-guide" class="onboarding-guide" role="note">まずは1つだけ書いて追加しましょう。新しいタブを開くたびに、今日やることへすぐ戻れます。</div>
+            <div id="onboarding-guide" class="onboarding-guide" role="note">はじめてなら、今日やることを1つだけ書いて追加しましょう。</div>
             <div id="empty-state" class="empty-state" hidden>
                 <div id="empty-state-title" class="empty-state-title">まだやることはありません</div>
                 <p id="empty-state-description" class="empty-state-description">今日やることを短く書くと、このタブがシンプルなチェックリストになります。</p>
+                <ul class="empty-state-steps">
+                    <li id="empty-state-step-input">入力欄に、今思い浮かぶ1つを書きます。</li>
+                    <li id="empty-state-step-return">追加したら、新しいタブでいつでも確認できます。</li>
+                </ul>
                 <button id="empty-state-action" class="empty-state-action" type="button" aria-controls="task-input">入力欄に移動</button>
             </div>
 

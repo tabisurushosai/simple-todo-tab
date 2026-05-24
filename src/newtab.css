@@ -195,6 +195,18 @@ a:focus-visible,
     color: var(--text-muted);
 }
 
+.empty-state-steps {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding-left: 1.25rem;
+    color: var(--text-muted);
+}
+
+.empty-state-steps li::marker {
+    color: var(--primary);
+}
+
 .empty-state-action {
     min-height: 48px;
     padding: 0 16px;

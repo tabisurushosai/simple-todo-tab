@@ -42,6 +42,8 @@ const onboardingGuide = getRequiredElement<HTMLDivElement>('onboarding-guide');
 const emptyState = getRequiredElement<HTMLDivElement>('empty-state');
 const emptyStateTitle = getRequiredElement<HTMLDivElement>('empty-state-title');
 const emptyStateDescription = getRequiredElement<HTMLParagraphElement>('empty-state-description');
+const emptyStateStepInput = getRequiredElement<HTMLLIElement>('empty-state-step-input');
+const emptyStateStepReturn = getRequiredElement<HTMLLIElement>('empty-state-step-return');
 const emptyStateAction = getRequiredElement<HTMLButtonElement>('empty-state-action');
 const taskList = getRequiredElement<HTMLUListElement>('task-list');
 const taskStatus = getRequiredElement<HTMLDivElement>('task-status');
@@ -122,6 +124,8 @@ function setupI18n() {
     setLocalizedText(onboardingGuide, 'onboardingGuide');
     setLocalizedText(emptyStateTitle, 'emptyStateTitle');
     setLocalizedText(emptyStateDescription, 'emptyStateDescription');
+    setLocalizedText(emptyStateStepInput, 'emptyStateStepInput');
+    setLocalizedText(emptyStateStepReturn, 'emptyStateStepReturn');
     setLocalizedText(emptyStateAction, 'emptyStateAction');
     setLocalizedText(upgradeLink, 'upgradeButton');
     setLocalizedText(themeLabel, 'themeLabel');
