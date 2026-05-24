@@ -20,6 +20,7 @@
     --warning-text: #713f12;
     --focus-ring: #1d4ed8;
     --focus-ring-shadow: rgba(29, 78, 216, 0.24);
+    --target-size: 56px;
     --shadow-card: 0 24px 64px rgba(15, 23, 42, 0.12);
     --shadow-item: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(15, 23, 42, 0.06);
 }
@@ -143,7 +144,7 @@ a:focus-visible,
 .task-input {
     flex: 1;
     min-width: 0;
-    min-height: 54px;
+    min-height: var(--target-size);
     padding: 14px 16px;
     color: var(--text);
     background: var(--surface);
@@ -158,14 +159,14 @@ a:focus-visible,
 }
 
 .task-input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .add-button,
 .task-action-button,
 .delete-button {
-    min-width: 52px;
-    min-height: 52px;
+    min-width: var(--target-size);
+    min-height: var(--target-size);
     border-radius: 12px;
     cursor: pointer;
     transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
@@ -243,7 +244,7 @@ a:focus-visible,
 }
 
 .empty-state-action {
-    min-height: 52px;
+    min-height: var(--target-size);
     padding: 0 16px;
     color: var(--primary);
     background: #eff6ff;
@@ -326,7 +327,7 @@ a:focus-visible,
 
 .task-item {
     display: grid;
-    grid-template-columns: 52px minmax(0, 1fr) 52px 52px 52px minmax(70px, auto);
+    grid-template-columns: var(--target-size) minmax(0, 1fr) var(--target-size) var(--target-size) var(--target-size) minmax(76px, auto);
     align-items: center;
     gap: 12px;
     padding: 15px 16px 15px 12px;
@@ -370,8 +371,8 @@ a:focus-visible,
 
 .task-checkbox-target {
     display: inline-grid;
-    width: 52px;
-    min-height: 52px;
+    width: var(--target-size);
+    min-height: var(--target-size);
     flex: 0 0 auto;
     place-items: center;
     cursor: pointer;
@@ -402,9 +403,9 @@ a:focus-visible,
 }
 
 .icon-button {
-    width: 52px;
-    min-width: 52px;
-    min-height: 52px;
+    width: var(--target-size);
+    min-width: var(--target-size);
+    min-height: var(--target-size);
     padding: 0;
     color: var(--text-subtle);
     border: 1px solid transparent;
@@ -427,7 +428,7 @@ a:focus-visible,
 }
 
 .task-action-button {
-    width: 52px;
+    width: var(--target-size);
     padding: 0;
     color: var(--text-subtle);
     border: 1px solid var(--border);
@@ -441,14 +442,14 @@ a:focus-visible,
 }
 
 .task-action-button:disabled {
-    color: #64748b;
+    color: var(--text-muted);
     background: var(--surface-muted);
-    border-color: #cbd5e1;
+    border-color: #94a3b8;
     cursor: default;
 }
 
 .delete-button {
-    min-width: 70px;
+    min-width: 76px;
     padding: 0 16px;
     color: var(--danger);
     border: 1px solid currentColor;
@@ -483,7 +484,7 @@ a:focus-visible,
 
 .upgrade-link {
     display: flex;
-    min-height: 52px;
+    min-height: var(--target-size);
     align-items: center;
     justify-content: center;
     margin-top: 10px;
@@ -515,8 +516,8 @@ a:focus-visible,
 }
 
 #theme-color {
-    width: 52px;
-    height: 52px;
+    width: var(--target-size);
+    height: var(--target-size);
     padding: 0;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -588,7 +589,7 @@ a:focus-visible,
     }
 
     .task-item {
-        grid-template-columns: 52px 52px minmax(0, 1fr);
+        grid-template-columns: var(--target-size) var(--target-size) minmax(0, 1fr);
         align-items: flex-start;
         gap: 8px 10px;
         padding: 14px;
@@ -606,7 +607,7 @@ a:focus-visible,
     .icon-button,
     .task-action-button,
     .delete-button {
-        min-height: 52px;
+        min-height: var(--target-size);
     }
 
     .task-checkbox-target {

@@ -59,6 +59,7 @@ type I18nMessageName =
     | 'premiumGateOneDay'
     | 'taskCountPlural'
     | 'taskCountSingular'
+    | 'taskKeyboardHelp'
     | 'taskInputLabel'
     | 'taskListLabel'
     | 'tasksRemainingStatus'
@@ -121,6 +122,7 @@ const emptyStateStepInput = getRequiredElement('empty-state-step-input', HTMLLIE
 const emptyStateStepReturn = getRequiredElement('empty-state-step-return', HTMLLIElement);
 const emptyStateAction = getRequiredElement('empty-state-action', HTMLButtonElement);
 const taskList = getRequiredElement('task-list', HTMLUListElement);
+const taskKeyboardHelp = getRequiredElement('task-keyboard-help', HTMLParagraphElement);
 const taskStatus = getRequiredElement('task-status', HTMLDivElement);
 const focusContainer = getRequiredElement('focus-container', HTMLDivElement);
 const focusLabel = getRequiredElement('focus-label', HTMLDivElement);
@@ -198,8 +200,10 @@ function setupI18n() {
     setLocalizedText(emptyStateAction, 'emptyStateAction');
     setLocalizedText(upgradeLink, 'upgradeButton');
     setLocalizedText(themeLabel, 'themeLabel');
+    setLocalizedText(taskKeyboardHelp, 'taskKeyboardHelp');
     themeColorInput.setAttribute('aria-label', getMessage('themeLabel'));
     taskList.setAttribute('aria-label', getMessage('taskListLabel'));
+    taskList.setAttribute('aria-describedby', 'task-status task-keyboard-help');
     setLocalizedText(historyTitle, 'historyTitle');
     historyList.setAttribute('aria-label', getMessage('historyListLabel'));
     setLocalizedText(premiumStatus, 'premiumActive');

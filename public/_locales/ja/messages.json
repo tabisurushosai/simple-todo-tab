@@ -28,6 +28,7 @@
   },
   "taskCountSingular": { "message": "件" },
   "taskCountPlural": { "message": "件" },
+  "taskKeyboardHelp": { "message": "Tabキーでタスク操作に移動し、上下矢印キーでタスク間、左右矢印キーで同じタスク内の操作を移動できます。" },
   "taskListLabel": { "message": "今日のタスクリスト" },
   "markTaskComplete": {
     "message": "完了にする: $TASK$",
