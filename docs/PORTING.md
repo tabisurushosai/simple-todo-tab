@@ -13,6 +13,9 @@
   `tasks`, `last_date`, `trial_start_ts`, `is_premium`, `history`, `theme`。
 - 保存キーの一覧とキー判定は `TODO_STORAGE_KEYS` / `isTodoStorageKey` を使い、
   プラットフォーム別アダプタ内で独自のキー一覧を重複定義しない。
+- 変更通知をアダプタから UI へ渡すときは `selectTodoStorageChanges` で
+  Todo 用キーだけに絞り、Chrome やモバイル保存 API 固有の変更オブジェクトを
+  UI / core 側へ漏らさない。
 - プラットフォーム別の保存実装は契約と同じ階層に置く。Chrome 拡張向けは
   `src/storage/chromeTodoStorage.ts`。iOS / Android 向けも core を変更せず、
   同じ `TodoStorageAdapter` interface を実装する。
@@ -39,7 +42,7 @@
 3. `get` は要求されたキーだけを読み、未保存のキーは `undefined` のまま返す。
 4. `set` は渡されたキーだけを更新し、既存の保存形式を変換しない。
 5. `subscribe` は `TodoStorageChanges` 形式へ変換して通知する。変更元 API が
-   余分なキーを返す場合は `isTodoStorageKey` で除外する。
+   余分なキーを返す場合は `selectTodoStorageChanges` で除外する。
 6. オフライン前提を変える別判断がない限り、保存は端末ローカルに閉じる。
 7. Chrome 版に remote code、外部 CDN / 外部フォント、`eval`、新しい権限を
    追加しない。

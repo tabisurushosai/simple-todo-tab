@@ -1,11 +1,10 @@
 import type {
     TodoStorageAdapter,
     TodoStorageChangeListener,
-    TodoStorageChanges,
     TodoStorageKey,
     TodoStorageSelection,
 } from './todoStorage';
-import { isTodoStorageKey } from './todoStorage';
+import { selectTodoStorageChanges } from './todoStorage';
 
 export function createChromeTodoStorage(): TodoStorageAdapter {
     return {
@@ -32,9 +31,7 @@ export function createChromeTodoStorage(): TodoStorageAdapter {
                     return;
                 }
 
-                const todoChanges = Object.fromEntries(
-                    Object.entries(changes).filter(([key]) => isTodoStorageKey(key)),
-                ) as TodoStorageChanges;
+                const todoChanges = selectTodoStorageChanges(changes);
                 if (Object.keys(todoChanges).length > 0) {
                     listener(todoChanges);
                 }
