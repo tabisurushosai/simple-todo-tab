@@ -10,6 +10,9 @@ export interface Task {
 }
 
 export type StoredTask = string | Task;
+type ToggleTaskCompletionResult =
+    | { tasks: Task[]; completedTask: Task }
+    | { tasks: Task[]; completedTask?: never };
 
 export function normalizeTasks(rawTasks: StoredTask[] = []): Task[] {
     return rawTasks.map(task => (
@@ -31,14 +34,15 @@ export function removeCompletedTasks(tasks: Task[]): Task[] {
     return tasks.filter(task => !task.completed);
 }
 
-export function moveTaskInList(tasks: Task[], index: number, direction: number): Task[] | null {
+export function moveTaskInList(tasks: Task[], index: number, direction: -1 | 1): Task[] | null {
     const newIndex = index + direction;
-    if (!tasks[index] || newIndex < 0 || newIndex >= tasks.length) {
+    const movedTask = tasks[index];
+    if (!movedTask || newIndex < 0 || newIndex >= tasks.length) {
         return null;
     }
 
     const nextTasks = [...tasks];
-    const [movedTask] = nextTasks.splice(index, 1);
+    nextTasks.splice(index, 1);
     nextTasks.splice(newIndex, 0, movedTask);
     return nextTasks;
 }
@@ -49,7 +53,7 @@ export function deleteTaskAt(tasks: Task[], index: number): Task[] {
     return nextTasks;
 }
 
-export function toggleTaskCompletion(tasks: Task[], index: number): { tasks: Task[]; completedTask?: Task } | null {
+export function toggleTaskCompletion(tasks: Task[], index: number): ToggleTaskCompletionResult | null {
     if (!tasks[index]) {
         return null;
     }
@@ -60,19 +64,22 @@ export function toggleTaskCompletion(tasks: Task[], index: number): { tasks: Tas
             : task
     ));
     const updatedTask = nextTasks[index];
-
-    return {
-        tasks: nextTasks,
-        completedTask: updatedTask.completed ? updatedTask : undefined,
-    };
-}
-
-export function toggleTaskFocus(tasks: Task[], index: number): Task[] | null {
-    if (!tasks[index]) {
+    if (!updatedTask) {
         return null;
     }
 
-    const currentFocus = tasks[index].focused;
+    return updatedTask.completed
+        ? { tasks: nextTasks, completedTask: updatedTask }
+        : { tasks: nextTasks };
+}
+
+export function toggleTaskFocus(tasks: Task[], index: number): Task[] | null {
+    const targetTask = tasks[index];
+    if (!targetTask) {
+        return null;
+    }
+
+    const currentFocus = targetTask.focused;
     return tasks.map((task, taskIndex) => ({
         ...task,
         focused: taskIndex === index ? !currentFocus : false,

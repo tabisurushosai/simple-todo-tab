@@ -12,7 +12,8 @@ import {
 } from './core/tasks';
 import { chromeTodoStorage } from './storage/chromeTodoStorage';
 
-type TaskFocusControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete' | 'item';
+type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
+type TaskFocusControl = TaskControl | 'item';
 type PendingFocusTarget =
     | { type: 'task'; control: TaskFocusControl; index: number }
     | { type: 'input' };
@@ -20,27 +21,40 @@ type PendingFocusTarget =
 let pendingFocusTarget: PendingFocusTarget | null = null;
 type SupportedLocale = 'ja' | 'en';
 
-const taskEntryForm = document.getElementById('task-entry') as HTMLFormElement;
-const taskInputLabel = document.getElementById('task-input-label') as HTMLLabelElement;
-const taskInput = document.getElementById('task-input') as HTMLInputElement;
-const addButton = document.getElementById('add-button') as HTMLButtonElement;
-const onboardingGuide = document.getElementById('onboarding-guide') as HTMLDivElement;
-const emptyState = document.getElementById('empty-state') as HTMLDivElement;
-const emptyStateTitle = document.getElementById('empty-state-title') as HTMLDivElement;
-const emptyStateDescription = document.getElementById('empty-state-description') as HTMLParagraphElement;
-const emptyStateAction = document.getElementById('empty-state-action') as HTMLButtonElement;
-const taskList = document.getElementById('task-list') as HTMLUListElement;
-const taskStatus = document.getElementById('task-status') as HTMLDivElement;
-const focusContainer = document.getElementById('focus-container') as HTMLDivElement;
-const focusText = document.getElementById('focus-text') as HTMLDivElement;
-const premiumGate = document.getElementById('premium-gate') as HTMLDivElement;
-const gateMessage = document.getElementById('gate-message') as HTMLSpanElement;
-const upgradeLink = document.getElementById('upgrade-link') as HTMLAnchorElement;
-const premiumFeatures = document.getElementById('premium-features') as HTMLDivElement;
-const premiumStatus = document.getElementById('premium-status') as HTMLDivElement;
-const themeColorInput = document.getElementById('theme-color') as HTMLInputElement;
-const historyList = document.getElementById('history-list') as HTMLUListElement;
-const historyStatus = document.getElementById('history-status') as HTMLDivElement;
+function getRequiredElement<T extends HTMLElement>(id: string): T {
+    const element = document.getElementById(id);
+    if (!element) {
+        throw new Error(`Missing required element: #${id}`);
+    }
+
+    return element as T;
+}
+
+const title = getRequiredElement<HTMLHeadingElement>('title');
+const taskEntryForm = getRequiredElement<HTMLFormElement>('task-entry');
+const taskInputLabel = getRequiredElement<HTMLLabelElement>('task-input-label');
+const taskInput = getRequiredElement<HTMLInputElement>('task-input');
+const addButton = getRequiredElement<HTMLButtonElement>('add-button');
+const onboardingGuide = getRequiredElement<HTMLDivElement>('onboarding-guide');
+const emptyState = getRequiredElement<HTMLDivElement>('empty-state');
+const emptyStateTitle = getRequiredElement<HTMLDivElement>('empty-state-title');
+const emptyStateDescription = getRequiredElement<HTMLParagraphElement>('empty-state-description');
+const emptyStateAction = getRequiredElement<HTMLButtonElement>('empty-state-action');
+const taskList = getRequiredElement<HTMLUListElement>('task-list');
+const taskStatus = getRequiredElement<HTMLDivElement>('task-status');
+const focusContainer = getRequiredElement<HTMLDivElement>('focus-container');
+const focusLabel = getRequiredElement<HTMLDivElement>('focus-label');
+const focusText = getRequiredElement<HTMLDivElement>('focus-text');
+const premiumGate = getRequiredElement<HTMLDivElement>('premium-gate');
+const gateMessage = getRequiredElement<HTMLSpanElement>('gate-message');
+const upgradeLink = getRequiredElement<HTMLAnchorElement>('upgrade-link');
+const premiumFeatures = getRequiredElement<HTMLDivElement>('premium-features');
+const premiumStatus = getRequiredElement<HTMLDivElement>('premium-status');
+const themeLabel = getRequiredElement<HTMLLabelElement>('theme-label');
+const themeColorInput = getRequiredElement<HTMLInputElement>('theme-color');
+const historyTitle = getRequiredElement<HTMLDivElement>('history-title');
+const historyList = getRequiredElement<HTMLUListElement>('history-list');
+const historyStatus = getRequiredElement<HTMLDivElement>('history-status');
 
 function getSupportedLocale(): SupportedLocale {
     const uiLocale = chrome.i18n.getMessage('@@ui_locale') || chrome.i18n.getUILanguage();
@@ -67,32 +81,28 @@ function i18nMessage(messageName: string, replacements: Record<string, string> =
     );
 }
 
+function setLocalizedText(element: HTMLElement, messageName: string) {
+    element.textContent = chrome.i18n.getMessage(messageName);
+}
+
 function setupI18n() {
     document.documentElement.lang = supportedLocale;
     document.title = chrome.i18n.getMessage('title');
-
-    const title = document.getElementById('title');
-    if (title) title.textContent = chrome.i18n.getMessage('title');
-    
-    const focusLabel = document.getElementById('focus-label');
-    if (focusLabel) focusLabel.textContent = chrome.i18n.getMessage('focusLabel');
-    
-    if (taskInputLabel) taskInputLabel.textContent = chrome.i18n.getMessage('taskInputLabel');
-    if (taskInput) taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
-    if (addButton) addButton.textContent = chrome.i18n.getMessage('addButton');
-    if (onboardingGuide) onboardingGuide.textContent = chrome.i18n.getMessage('onboardingGuide');
-    if (emptyStateTitle) emptyStateTitle.textContent = chrome.i18n.getMessage('emptyStateTitle');
-    if (emptyStateDescription) emptyStateDescription.textContent = chrome.i18n.getMessage('emptyStateDescription');
-    if (emptyStateAction) emptyStateAction.textContent = chrome.i18n.getMessage('emptyStateAction');
-
-    if (upgradeLink) upgradeLink.textContent = chrome.i18n.getMessage('upgradeButton');
-    const themeLabel = document.getElementById('theme-label');
-    if (themeLabel) themeLabel.textContent = chrome.i18n.getMessage('themeLabel');
-    if (themeColorInput) themeColorInput.setAttribute('aria-label', chrome.i18n.getMessage('themeLabel'));
-    const historyTitle = document.getElementById('history-title');
-    if (historyTitle) historyTitle.textContent = chrome.i18n.getMessage('historyTitle');
-    if (premiumStatus) premiumStatus.textContent = chrome.i18n.getMessage('premiumActive');
-    if (taskStatus) taskStatus.textContent = chrome.i18n.getMessage('loadingTasks');
+    setLocalizedText(title, 'title');
+    setLocalizedText(focusLabel, 'focusLabel');
+    setLocalizedText(taskInputLabel, 'taskInputLabel');
+    taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
+    setLocalizedText(addButton, 'addButton');
+    setLocalizedText(onboardingGuide, 'onboardingGuide');
+    setLocalizedText(emptyStateTitle, 'emptyStateTitle');
+    setLocalizedText(emptyStateDescription, 'emptyStateDescription');
+    setLocalizedText(emptyStateAction, 'emptyStateAction');
+    setLocalizedText(upgradeLink, 'upgradeButton');
+    setLocalizedText(themeLabel, 'themeLabel');
+    themeColorInput.setAttribute('aria-label', chrome.i18n.getMessage('themeLabel'));
+    setLocalizedText(historyTitle, 'historyTitle');
+    setLocalizedText(premiumStatus, 'premiumActive');
+    setLocalizedText(taskStatus, 'loadingTasks');
 }
 
 function taskMessage(messageName: string, taskText: string): string {
@@ -128,7 +138,8 @@ function focusPendingTarget() {
     for (const selector of selectors) {
         const element = taskList.querySelector<HTMLElement>(selector);
         if (!element) continue;
-        if ('disabled' in element && element.disabled) continue;
+        if (element instanceof HTMLButtonElement && element.disabled) continue;
+        if (element instanceof HTMLInputElement && element.disabled) continue;
 
         element.focus({ preventScroll: true });
         return;
@@ -189,6 +200,44 @@ function setTaskStatus(tasks: Task[]) {
         .replace('$TOTAL$', formatNumber(tasks.length));
 }
 
+function setTaskControlAttributes(element: HTMLElement, control: TaskControl, index: number) {
+    element.setAttribute('data-task-control', control);
+    element.setAttribute('data-task-index', index.toString());
+}
+
+interface MoveTaskButtonOptions {
+    task: Task;
+    index: number;
+    direction: -1 | 1;
+    control: 'move-up' | 'move-down';
+    textContent: string;
+    messageName: 'moveTaskUpForTask' | 'moveTaskDownForTask';
+    disabled: boolean;
+}
+
+function createMoveTaskButton({
+    task,
+    index,
+    direction,
+    control,
+    textContent,
+    messageName,
+    disabled,
+}: MoveTaskButtonOptions): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = textContent;
+    button.className = 'task-action-button';
+    button.setAttribute('aria-label', taskMessage(messageName, task.text));
+    setTaskControlAttributes(button, control, index);
+    button.disabled = disabled;
+    button.addEventListener('click', () => {
+        queueTaskFocus('item', index + direction);
+        void moveTask(index, direction);
+    });
+    return button;
+}
+
 function renderTasks(tasks: Task[]) {
     taskList.innerHTML = '';
     setTaskStatus(tasks);
@@ -216,8 +265,7 @@ function renderTasks(tasks: Task[]) {
         checkbox.checked = task.completed;
         checkbox.className = 'task-checkbox';
         checkbox.setAttribute('aria-label', taskMessage(task.completed ? 'markTaskIncomplete' : 'markTaskComplete', task.text));
-        checkbox.setAttribute('data-task-control', 'checkbox');
-        checkbox.setAttribute('data-task-index', index.toString());
+        setTaskControlAttributes(checkbox, 'checkbox', index);
         checkbox.addEventListener('change', () => {
             queueTaskFocus('checkbox', index);
             void toggleTask(index);
@@ -237,37 +285,30 @@ function renderTasks(tasks: Task[]) {
             'aria-label',
             taskMessage(task.focused ? 'clearFocusTaskButtonForTask' : 'focusTaskButtonForTask', task.text),
         );
-        focusButton.setAttribute('data-task-control', 'focus');
-        focusButton.setAttribute('data-task-index', index.toString());
+        setTaskControlAttributes(focusButton, 'focus', index);
         focusButton.addEventListener('click', () => {
             queueTaskFocus('focus', index);
             void toggleFocus(index);
         });
 
-        const moveUpButton = document.createElement('button');
-        moveUpButton.type = 'button';
-        moveUpButton.textContent = '↑';
-        moveUpButton.className = 'task-action-button';
-        moveUpButton.setAttribute('aria-label', taskMessage('moveTaskUpForTask', task.text));
-        moveUpButton.setAttribute('data-task-control', 'move-up');
-        moveUpButton.setAttribute('data-task-index', index.toString());
-        moveUpButton.disabled = index === 0;
-        moveUpButton.addEventListener('click', () => {
-            queueTaskFocus('item', index - 1);
-            void moveTask(index, -1);
+        const moveUpButton = createMoveTaskButton({
+            task,
+            index,
+            direction: -1,
+            control: 'move-up',
+            textContent: '↑',
+            messageName: 'moveTaskUpForTask',
+            disabled: index === 0,
         });
 
-        const moveDownButton = document.createElement('button');
-        moveDownButton.type = 'button';
-        moveDownButton.textContent = '↓';
-        moveDownButton.className = 'task-action-button';
-        moveDownButton.setAttribute('aria-label', taskMessage('moveTaskDownForTask', task.text));
-        moveDownButton.setAttribute('data-task-control', 'move-down');
-        moveDownButton.setAttribute('data-task-index', index.toString());
-        moveDownButton.disabled = index === tasks.length - 1;
-        moveDownButton.addEventListener('click', () => {
-            queueTaskFocus('item', index + 1);
-            void moveTask(index, 1);
+        const moveDownButton = createMoveTaskButton({
+            task,
+            index,
+            direction: 1,
+            control: 'move-down',
+            textContent: '↓',
+            messageName: 'moveTaskDownForTask',
+            disabled: index === tasks.length - 1,
         });
 
         const deleteButton = document.createElement('button');
@@ -275,8 +316,7 @@ function renderTasks(tasks: Task[]) {
         deleteButton.textContent = chrome.i18n.getMessage('deleteButton');
         deleteButton.className = 'delete-button';
         deleteButton.setAttribute('aria-label', taskMessage('deleteTaskButtonForTask', task.text));
-        deleteButton.setAttribute('data-task-control', 'delete');
-        deleteButton.setAttribute('data-task-index', index.toString());
+        setTaskControlAttributes(deleteButton, 'delete', index);
         deleteButton.addEventListener('click', () => {
             const nextIndex = Math.min(index, tasks.length - 2);
             if (nextIndex >= 0) {
@@ -335,7 +375,7 @@ async function loadTasks() {
     }
 }
 
-async function moveTask(index: number, direction: number) {
+async function moveTask(index: number, direction: -1 | 1) {
     const result = await chromeTodoStorage.get(['tasks']);
     const tasks = normalizeTasks(result.tasks);
     const newTasks = moveTaskInList(tasks, index, direction);
