@@ -1,23 +1,23 @@
 {
   "extName": { "message": "Just Today" },
-  "extDesc": { "message": "Shows only today's tasks in every new tab so you can focus on one thing now." },
+  "extDesc": { "message": "Shows only today's tasks on every new tab, helping you focus on one thing now." },
   "title": { "message": "Today's tasks" },
   "focusLabel": { "message": "Current focus" },
-  "taskInputLabel": { "message": "Task input for today" },
+  "taskInputLabel": { "message": "Today's task" },
   "inputPlaceholder": { "message": "What will you do today?" },
   "addButton": { "message": "Add" },
-  "onboardingGuide": { "message": "New here? Add just one thing you want to do today." },
+  "onboardingGuide": { "message": "Start by adding one thing you want to do today." },
   "emptyStateTitle": { "message": "No tasks yet" },
-  "emptyStateDescription": { "message": "Write a short task for today and this tab becomes a simple checklist." },
-  "emptyStateStepInput": { "message": "Write one thing that comes to mind in the input." },
-  "emptyStateStepReturn": { "message": "After you add it, every new tab will keep it close by." },
+  "emptyStateDescription": { "message": "Add a short task for today, and this tab becomes a simple checklist." },
+  "emptyStateStepInput": { "message": "Type one thing that comes to mind." },
+  "emptyStateStepReturn": { "message": "After you add it, every new tab will show it." },
   "emptyStateAction": { "message": "Go to task input" },
   "deleteButton": { "message": "Delete" },
   "loadingTasks": { "message": "Loading tasks..." },
   "emptyTasks": { "message": "No tasks yet. Add one thing to do today." },
-  "allTasksComplete": { "message": "All of today's tasks are complete. Nice work." },
+  "allTasksComplete": { "message": "Everything for today is complete. Nice work." },
   "tasksRemainingStatus": {
-    "message": "$ACTIVE$ $ACTIVE_TASK_LABEL$ remaining / $TOTAL$ $TOTAL_TASK_LABEL$ total",
+    "message": "$ACTIVE$ $ACTIVE_TASK_LABEL$ left / $TOTAL$ $TOTAL_TASK_LABEL$ total",
     "placeholders": {
       "active": { "content": "$1" },
       "active_task_label": { "content": "$2" },
@@ -29,7 +29,7 @@
   "taskCountPlural": { "message": "tasks" },
   "taskListLabel": { "message": "Today's task list" },
   "markTaskComplete": {
-    "message": "Mark complete: $TASK$",
+    "message": "Mark as complete: $TASK$",
     "placeholders": { "task": { "content": "$1" } }
   },
   "markTaskIncomplete": {
@@ -37,11 +37,11 @@
     "placeholders": { "task": { "content": "$1" } }
   },
   "focusTaskButtonForTask": {
-    "message": "Set as focus task: $TASK$",
+    "message": "Set as current focus: $TASK$",
     "placeholders": { "task": { "content": "$1" } }
   },
   "clearFocusTaskButtonForTask": {
-    "message": "Clear focus task: $TASK$",
+    "message": "Clear current focus: $TASK$",
     "placeholders": { "task": { "content": "$1" } }
   },
   "moveTaskUpForTask": {
@@ -57,18 +57,18 @@
     "placeholders": { "task": { "content": "$1" } }
   },
   "premiumGate": {
-    "message": "Trial ends in $DAYS$ days. Upgrade to Premium to use background color and completion history.",
+    "message": "Trial has $DAYS$ days left. Upgrade to Premium for a custom background color and completion history.",
     "placeholders": { "days": { "content": "$1" } }
   },
   "premiumGateOneDay": {
-    "message": "Trial ends in $DAYS$ day. Upgrade to Premium to use background color and completion history.",
+    "message": "Trial has $DAYS$ day left. Upgrade to Premium for a custom background color and completion history.",
     "placeholders": { "days": { "content": "$1" } }
   },
-  "premiumGateExpired": { "message": "Trial has ended. Upgrade to Premium to use background color and completion history." },
+  "premiumGateExpired": { "message": "Trial has ended. Upgrade to Premium for a custom background color and completion history." },
   "upgradeButton": { "message": "Upgrade to Premium" },
   "themeLabel": { "message": "Background color" },
   "historyTitle": { "message": "Completion history" },
-  "historyListLabel": { "message": "Completed task history" },
+  "historyListLabel": { "message": "Completion history list" },
   "historyEmpty": { "message": "No completion history yet." },
   "historyItem": {
     "message": "$DATE$: $TASK$",
@@ -77,5 +77,5 @@
       "task": { "content": "$2" }
     }
   },
-  "premiumActive": { "message": "Premium active" }
+  "premiumActive": { "message": "Premium is active" }
 }
