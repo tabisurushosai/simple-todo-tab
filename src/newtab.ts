@@ -14,6 +14,7 @@ import { chromeTodoStorage } from './storage/chromeTodoStorage';
 
 type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
 type TaskFocusControl = TaskControl | 'item';
+type TaskStatusState = 'loading' | 'empty' | 'active' | 'complete';
 type PendingFocusTarget =
     | { type: 'task'; control: TaskFocusControl; index: number }
     | { type: 'input' };
@@ -85,6 +86,11 @@ function setLocalizedText(element: HTMLElement, messageName: string) {
     element.textContent = chrome.i18n.getMessage(messageName);
 }
 
+function setTaskStatusMessage(message: string, state: TaskStatusState) {
+    taskStatus.textContent = message;
+    taskStatus.dataset.state = state;
+}
+
 function setupI18n() {
     document.documentElement.lang = supportedLocale;
     document.title = chrome.i18n.getMessage('title');
@@ -102,7 +108,8 @@ function setupI18n() {
     themeColorInput.setAttribute('aria-label', chrome.i18n.getMessage('themeLabel'));
     setLocalizedText(historyTitle, 'historyTitle');
     setLocalizedText(premiumStatus, 'premiumActive');
-    setLocalizedText(taskStatus, 'loadingTasks');
+    setTaskStatusMessage(chrome.i18n.getMessage('loadingTasks'), 'loading');
+    taskList.setAttribute('aria-busy', 'true');
 }
 
 function taskMessage(messageName: string, taskText: string): string {
@@ -185,19 +192,22 @@ function updatePremiumUI(isPremium: boolean, trialStartTs: number) {
 
 function setTaskStatus(tasks: Task[]) {
     if (tasks.length === 0) {
-        taskStatus.textContent = chrome.i18n.getMessage('emptyTasks');
+        setTaskStatusMessage(chrome.i18n.getMessage('emptyTasks'), 'empty');
         return;
     }
 
     const remaining = tasks.filter(task => !task.completed).length;
     if (remaining === 0) {
-        taskStatus.textContent = chrome.i18n.getMessage('allTasksComplete');
+        setTaskStatusMessage(chrome.i18n.getMessage('allTasksComplete'), 'complete');
         return;
     }
 
-    taskStatus.textContent = chrome.i18n.getMessage('tasksRemainingStatus')
-        .replace('$ACTIVE$', formatNumber(remaining))
-        .replace('$TOTAL$', formatNumber(tasks.length));
+    setTaskStatusMessage(
+        chrome.i18n.getMessage('tasksRemainingStatus')
+            .replace('$ACTIVE$', formatNumber(remaining))
+            .replace('$TOTAL$', formatNumber(tasks.length)),
+        'active',
+    );
 }
 
 function setTaskControlAttributes(element: HTMLElement, control: TaskControl, index: number) {
@@ -240,6 +250,7 @@ function createMoveTaskButton({
 
 function renderTasks(tasks: Task[]) {
     taskList.innerHTML = '';
+    taskList.setAttribute('aria-busy', 'false');
     setTaskStatus(tasks);
     const isEmpty = tasks.length === 0;
     onboardingGuide.hidden = !isEmpty;
