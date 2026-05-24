@@ -175,8 +175,13 @@ a:focus-visible,
 
 .onboarding-guide {
     margin: -4px 0 18px;
+    padding: 12px 14px;
     color: var(--text-muted);
+    background: #f8fbff;
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
     font-size: 14px;
+    font-weight: 700;
 }
 
 .empty-state {
