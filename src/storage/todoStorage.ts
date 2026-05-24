@@ -45,5 +45,3 @@ export interface TodoStorageAdapter {
     set(values: TodoStoragePatch): Promise<void>;
     subscribe(listener: TodoStorageChangeListener): TodoStorageUnsubscribe;
 }
-
-export type TodoStorage = TodoStorageAdapter;
