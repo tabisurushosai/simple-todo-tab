@@ -9,6 +9,7 @@
   "onboardingGuide": { "message": "Start by adding one thing you want to do today." },
   "emptyStateTitle": { "message": "No tasks yet" },
   "emptyStateDescription": { "message": "Add a short task for today, and this tab becomes a simple checklist." },
+  "emptyStateExample": { "message": "Not sure what to write? Start small, like \"Tidy for 10 minutes.\"" },
   "emptyStateStepInput": { "message": "Type one thing that comes to mind." },
   "emptyStateStepReturn": { "message": "After you add it, every new tab will show it." },
   "emptyStateAction": { "message": "Go to task input" },
