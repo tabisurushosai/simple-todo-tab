@@ -28,6 +28,7 @@
   },
   "taskCountSingular": { "message": "task" },
   "taskCountPlural": { "message": "tasks" },
+  "taskKeyboardHelp": { "message": "Use Tab to reach task controls, Up and Down arrows to move between tasks, and Left and Right arrows to move between controls for the same task." },
   "taskListLabel": { "message": "Today's task list" },
   "markTaskComplete": {
     "message": "Mark as complete: $TASK$",
