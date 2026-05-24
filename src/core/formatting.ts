@@ -7,14 +7,20 @@ export function getLocaleTag(locale: SupportedLocale): string {
 function getHistoryDateFormatOptions(locale: SupportedLocale): Intl.DateTimeFormatOptions {
     return locale === 'en'
         ? {
-            dateStyle: 'medium',
-            timeStyle: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
             hour12: true,
         }
         : {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-            hour12: false,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23',
         };
 }
 
