@@ -6,7 +6,7 @@
     --surface-raised: #ffffff;
     --text: #0f172a;
     --text-muted: #475569;
-    --text-subtle: #64748b;
+    --text-subtle: #334155;
     --border: #64748b;
     --border-soft: #e6ebf2;
     --primary: #1d4ed8;
@@ -60,7 +60,7 @@ a:focus-visible,
 .task-item:focus,
 .task-checkbox-target:focus-within {
     outline: 3px solid var(--focus-ring);
-    outline-offset: 2px;
+    outline-offset: 3px;
     box-shadow: 0 0 0 5px var(--focus-ring-shadow);
 }
 
@@ -213,7 +213,7 @@ a:focus-visible,
 }
 
 .empty-state-action {
-    min-height: 48px;
+    min-height: 52px;
     padding: 0 16px;
     color: var(--primary);
     background: #eff6ff;
@@ -319,8 +319,8 @@ a:focus-visible,
 
 .task-checkbox-target {
     display: inline-grid;
-    width: 50px;
-    min-height: 50px;
+    width: 52px;
+    min-height: 52px;
     flex: 0 0 auto;
     place-items: center;
     cursor: pointer;
@@ -349,8 +349,8 @@ a:focus-visible,
 }
 
 .icon-button {
-    width: 50px;
-    min-height: 50px;
+    width: 52px;
+    min-height: 52px;
     padding: 0;
     color: var(--text-muted);
     border: 1px solid transparent;
@@ -367,7 +367,7 @@ a:focus-visible,
 }
 
 .task-action-button {
-    width: 50px;
+    width: 52px;
     padding: 0;
     color: var(--text-muted);
     border: 1px solid var(--border);
@@ -382,9 +382,9 @@ a:focus-visible,
 
 .task-action-button:disabled {
     color: var(--text-subtle);
-    border-color: var(--border-soft);
+    background: var(--surface-muted);
+    border-color: #94a3b8;
     cursor: default;
-    opacity: 0.45;
 }
 
 .delete-button {
@@ -423,7 +423,7 @@ a:focus-visible,
 
 .upgrade-link {
     display: flex;
-    min-height: 48px;
+    min-height: 52px;
     align-items: center;
     justify-content: center;
     margin-top: 10px;
@@ -455,8 +455,8 @@ a:focus-visible,
 }
 
 #theme-color {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     padding: 0;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -487,6 +487,15 @@ a:focus-visible,
 
 .history-item:last-child {
     border-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
+    }
 }
 
 @media (max-width: 560px) {
