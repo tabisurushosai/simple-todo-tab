@@ -10,6 +10,11 @@ import {
     type HistoryItem,
     type Task,
 } from './core/tasks';
+import {
+    formatDisplayNumber,
+    formatHistoryDate,
+    type SupportedLocale,
+} from './core/formatting';
 import { createChromeTodoStorage } from './storage/chromeTodoStorage';
 import { TODO_STORAGE_KEYS, type TodoStorageAdapter } from './storage/todoStorage';
 
@@ -43,6 +48,7 @@ type I18nMessageName =
     | 'onboardingGuide'
     | 'premiumActive'
     | 'premiumGate'
+    | 'premiumGateExpired'
     | 'premiumGateOneDay'
     | 'taskCountPlural'
     | 'taskCountSingular'
@@ -69,7 +75,6 @@ type PendingFocusTarget =
     | { type: 'input' };
 
 let pendingFocusTarget: PendingFocusTarget | null = null;
-type SupportedLocale = 'ja' | 'en';
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
 const taskControls = ['checkbox', 'focus', 'move-up', 'move-down', 'delete'] as const satisfies readonly TaskControl[];
 const taskNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
@@ -121,33 +126,8 @@ function getSupportedLocale(): SupportedLocale {
 
 const supportedLocale = getSupportedLocale();
 
-function getLocaleTag(locale: SupportedLocale): string {
-    return locale === 'en' ? 'en-US' : 'ja-JP';
-}
-
-const localeTag = getLocaleTag(supportedLocale);
-const numberFormatter = new Intl.NumberFormat(localeTag);
-const historyDateFormatOptions: Intl.DateTimeFormatOptions = supportedLocale === 'en'
-    ? {
-        weekday: 'short',
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-    }
-    : {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    };
-const historyDateFormatter = new Intl.DateTimeFormat(localeTag, historyDateFormatOptions);
-
 function formatNumber(value: number): string {
-    return numberFormatter.format(value);
+    return formatDisplayNumber(value, supportedLocale);
 }
 
 function getMessage(messageName: I18nMessageName): string {
@@ -326,7 +306,7 @@ function renderHistory(history: HistoryItem[]) {
     historyStatus.hidden = true;
     history.slice(-20).reverse().forEach(item => {
         const li = document.createElement('li');
-        const date = historyDateFormatter.format(new Date(item.completed_at));
+        const date = formatHistoryDate(item.completed_at, supportedLocale);
         li.textContent = i18nMessage('historyItem', { DATE: date, TASK: item.text });
         li.className = 'history-item';
         historyList.appendChild(li);
@@ -344,7 +324,7 @@ function updatePremiumUI(isPremium: boolean, trialStartTs: number) {
         const elapsed = Date.now() - trialStartTs;
         const remaining = Math.max(0, Math.ceil((trialDays * 24 * 60 * 60 * 1000 - elapsed) / (24 * 60 * 60 * 1000)));
         gateMessage.textContent = i18nMessage(
-            remaining === 1 ? 'premiumGateOneDay' : 'premiumGate',
+            remaining === 0 ? 'premiumGateExpired' : remaining === 1 ? 'premiumGateOneDay' : 'premiumGate',
             { DAYS: formatNumber(remaining) },
         );
     }
