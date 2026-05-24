@@ -18,7 +18,11 @@ import {
 import { createChromeTodoStorage } from './storage/chromeTodoStorage';
 import { TODO_STORAGE_KEYS, type TodoStorageAdapter } from './storage/todoStorage';
 
-type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
+const taskControls = ['checkbox', 'focus', 'move-up', 'move-down', 'delete'] as const;
+const taskVerticalNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
+const taskNavigationKeys = [...taskVerticalNavigationKeys, 'ArrowLeft', 'ArrowRight'] as const;
+
+type TaskControl = typeof taskControls[number];
 type TaskFocusControl = TaskControl | 'item';
 type TaskStatusState = 'loading' | 'empty' | 'active' | 'complete';
 type TaskNavigationKey = typeof taskNavigationKeys[number];
@@ -79,12 +83,16 @@ type PendingFocusTarget =
 
 let pendingFocusTarget: PendingFocusTarget | null = null;
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
-const taskControls = ['checkbox', 'focus', 'move-up', 'move-down', 'delete'] as const satisfies readonly TaskControl[];
-const taskVerticalNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
-const taskNavigationKeys = [...taskVerticalNavigationKeys, 'ArrowLeft', 'ArrowRight'] as const;
 
 function isStringInList<T extends string>(values: readonly T[], value: string | undefined): value is T {
     return value !== undefined && (values as readonly string[]).includes(value);
+}
+
+function isDisabledControlElement(element: HTMLElement): element is HTMLButtonElement | HTMLInputElement {
+    return (
+        (element instanceof HTMLButtonElement || element instanceof HTMLInputElement)
+        && element.disabled
+    );
 }
 
 function getRequiredElement<T extends HTMLElement>(
@@ -232,8 +240,7 @@ function focusTaskTarget(target: { control: TaskFocusControl; index: number }): 
     for (const selector of getTaskFocusSelectors(target)) {
         const element = taskList.querySelector<HTMLElement>(selector);
         if (!element) continue;
-        if (element instanceof HTMLButtonElement && element.disabled) continue;
-        if (element instanceof HTMLInputElement && element.disabled) continue;
+        if (isDisabledControlElement(element)) continue;
 
         element.focus({ preventScroll: true });
         return true;
@@ -308,8 +315,7 @@ function focusTaskControlFromOrder(index: number, startControlIndex: number, ste
             `[data-task-control="${control}"][data-task-index="${index}"]`,
         );
         if (!element) continue;
-        if (element instanceof HTMLButtonElement && element.disabled) continue;
-        if (element instanceof HTMLInputElement && element.disabled) continue;
+        if (isDisabledControlElement(element)) continue;
 
         element.focus({ preventScroll: true });
         return true;
