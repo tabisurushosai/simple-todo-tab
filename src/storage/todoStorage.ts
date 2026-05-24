@@ -20,6 +20,10 @@ export const TODO_STORAGE_KEYS = [
     'theme',
 ] as const satisfies readonly TodoStorageKey[];
 
+export function isTodoStorageKey(key: string): key is TodoStorageKey {
+    return (TODO_STORAGE_KEYS as readonly string[]).includes(key);
+}
+
 export interface TodoStorageChange<T = unknown> {
     oldValue?: T;
     newValue?: T;
@@ -32,6 +36,10 @@ export type TodoStorageUnsubscribe = () => void;
 export type TodoStorageSelection<K extends TodoStorageKey> = Pick<TodoStorageValues, K>;
 export type TodoStoragePatch = Partial<TodoStorageValues>;
 
+/**
+ * Platform storage port used by UI code.
+ * Keep implementations local/offline and preserve the JSON-compatible value shape above.
+ */
 export interface TodoStorageAdapter {
     get<K extends TodoStorageKey>(keys: readonly K[]): Promise<TodoStorageSelection<K>>;
     set(values: TodoStoragePatch): Promise<void>;

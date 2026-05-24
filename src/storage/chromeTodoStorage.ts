@@ -5,11 +5,7 @@ import type {
     TodoStorageKey,
     TodoStorageSelection,
 } from './todoStorage';
-import { TODO_STORAGE_KEYS } from './todoStorage';
-
-function isTodoStorageKey(key: string): key is TodoStorageKey {
-    return (TODO_STORAGE_KEYS as readonly string[]).includes(key);
-}
+import { isTodoStorageKey } from './todoStorage';
 
 export function createChromeTodoStorage(): TodoStorageAdapter {
     return {
