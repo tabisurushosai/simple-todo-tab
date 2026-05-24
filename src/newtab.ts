@@ -22,6 +22,7 @@ type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
 type TaskFocusControl = TaskControl | 'item';
 type TaskStatusState = 'loading' | 'empty' | 'active' | 'complete';
 type TaskNavigationKey = typeof taskNavigationKeys[number];
+type TaskVerticalNavigationKey = typeof taskVerticalNavigationKeys[number];
 type I18nMessageName =
     | 'addButton'
     | 'allTasksComplete'
@@ -78,7 +79,8 @@ type PendingFocusTarget =
 let pendingFocusTarget: PendingFocusTarget | null = null;
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
 const taskControls = ['checkbox', 'focus', 'move-up', 'move-down', 'delete'] as const satisfies readonly TaskControl[];
-const taskNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
+const taskVerticalNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
+const taskNavigationKeys = [...taskVerticalNavigationKeys, 'ArrowLeft', 'ArrowRight'] as const;
 
 function isStringInList<T extends string>(values: readonly T[], value: string | undefined): value is T {
     return value !== undefined && (values as readonly string[]).includes(value);
@@ -263,6 +265,10 @@ function isTaskNavigationKey(value: string): value is TaskNavigationKey {
     return isStringInList(taskNavigationKeys, value);
 }
 
+function isTaskVerticalNavigationKey(value: TaskNavigationKey): value is TaskVerticalNavigationKey {
+    return isStringInList(taskVerticalNavigationKeys, value);
+}
+
 function getTaskIndexFromElement(element: HTMLElement): number | null {
     const taskElement = element.closest<HTMLElement>('li[data-task-index]');
     const rawIndex = taskElement?.dataset.taskIndex;
@@ -279,7 +285,7 @@ function getTaskControlFromElement(element: HTMLElement): TaskFocusControl {
     return isTaskControl(control) ? control : 'item';
 }
 
-function getKeyboardTargetIndex(key: TaskNavigationKey, currentIndex: number, taskCount: number): number {
+function getKeyboardTargetIndex(key: TaskVerticalNavigationKey, currentIndex: number, taskCount: number): number {
     switch (key) {
         case 'ArrowUp':
             return Math.max(0, currentIndex - 1);
@@ -290,6 +296,33 @@ function getKeyboardTargetIndex(key: TaskNavigationKey, currentIndex: number, ta
         case 'End':
             return taskCount - 1;
     }
+}
+
+function focusTaskControlFromOrder(index: number, startControlIndex: number, step: -1 | 1): boolean {
+    for (let controlIndex = startControlIndex; controlIndex >= 0 && controlIndex < taskControls.length; controlIndex += step) {
+        const control = taskControls[controlIndex];
+        const element = taskList.querySelector<HTMLElement>(
+            `[data-task-control="${control}"][data-task-index="${index}"]`,
+        );
+        if (!element) continue;
+        if (element instanceof HTMLButtonElement && element.disabled) continue;
+        if (element instanceof HTMLInputElement && element.disabled) continue;
+
+        element.focus({ preventScroll: true });
+        return true;
+    }
+
+    return false;
+}
+
+function focusAdjacentTaskControl(key: Extract<TaskNavigationKey, 'ArrowLeft' | 'ArrowRight'>, currentIndex: number, currentControl: TaskFocusControl): boolean {
+    const step = key === 'ArrowRight' ? 1 : -1;
+    const currentControlIndex = currentControl === 'item' ? -1 : taskControls.indexOf(currentControl);
+    const startControlIndex = currentControlIndex === -1
+        ? (step === 1 ? 0 : taskControls.length - 1)
+        : currentControlIndex + step;
+
+    return focusTaskControlFromOrder(currentIndex, startControlIndex, step);
 }
 
 function handleTaskListKeydown(event: KeyboardEvent) {
@@ -308,8 +341,14 @@ function handleTaskListKeydown(event: KeyboardEvent) {
     }
 
     event.preventDefault();
+    const currentControl = getTaskControlFromElement(event.target);
+    if (!isTaskVerticalNavigationKey(event.key)) {
+        focusAdjacentTaskControl(event.key, currentIndex, currentControl);
+        return;
+    }
+
     focusTaskTarget({
-        control: getTaskControlFromElement(event.target),
+        control: currentControl,
         index: getKeyboardTargetIndex(event.key, currentIndex, taskCount),
     });
 }
@@ -418,7 +457,9 @@ function renderTasks(tasks: Task[]) {
     const isEmpty = tasks.length === 0;
     onboardingGuide.hidden = !isEmpty;
     emptyState.hidden = !isEmpty;
-    taskEntryForm.setAttribute('aria-describedby', isEmpty ? 'onboarding-guide task-status' : 'task-status');
+    const taskEntryDescription = isEmpty ? 'onboarding-guide task-status' : 'task-status';
+    taskEntryForm.setAttribute('aria-describedby', taskEntryDescription);
+    taskInput.setAttribute('aria-describedby', taskEntryDescription);
     const focusedTask = tasks.find(t => t.focused);
     if (focusedTask && !focusedTask.completed) {
         focusContainer.style.display = 'block';
@@ -434,6 +475,9 @@ function renderTasks(tasks: Task[]) {
         li.setAttribute('data-task-index', index.toString());
         li.setAttribute('aria-posinset', (index + 1).toString());
         li.setAttribute('aria-setsize', tasks.length.toString());
+        if (task.focused && !task.completed) {
+            li.setAttribute('aria-current', 'true');
+        }
 
         const checkboxLabel = document.createElement('label');
         checkboxLabel.className = 'task-checkbox-target';

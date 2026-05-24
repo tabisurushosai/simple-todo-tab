@@ -65,6 +65,10 @@ a:focus-visible,
     box-shadow: 0 0 0 5px var(--focus-ring-shadow);
 }
 
+.task-item:focus {
+    border-color: var(--focus-ring);
+}
+
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -155,6 +159,7 @@ a:focus-visible,
 .add-button,
 .task-action-button,
 .delete-button {
+    min-width: 52px;
     min-height: 52px;
     border-radius: 12px;
     cursor: pointer;
@@ -364,14 +369,21 @@ a:focus-visible,
 
 .icon-button {
     width: 52px;
+    min-width: 52px;
     min-height: 52px;
     padding: 0;
-    color: var(--text-muted);
+    color: var(--text-subtle);
     border: 1px solid transparent;
     border-radius: 999px;
     cursor: pointer;
     font-size: 22px;
     line-height: 1;
+}
+
+.icon-button:hover {
+    color: var(--primary);
+    background: #eff6ff;
+    border-color: var(--primary);
 }
 
 .focus-button--active {
@@ -383,7 +395,7 @@ a:focus-visible,
 .task-action-button {
     width: 52px;
     padding: 0;
-    color: var(--text-muted);
+    color: var(--text-subtle);
     border: 1px solid var(--border);
     font-weight: 700;
 }
@@ -501,6 +513,17 @@ a:focus-visible,
 
 .history-item:last-child {
     border-bottom: 0;
+}
+
+@media (forced-colors: active) {
+    button:focus-visible,
+    input:focus-visible,
+    a:focus-visible,
+    .task-item:focus,
+    .task-checkbox-target:focus-within {
+        outline: 3px solid Highlight;
+        box-shadow: none;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
