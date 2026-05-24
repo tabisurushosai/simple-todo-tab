@@ -15,6 +15,7 @@
   "emptyTasks": { "message": "No tasks yet. Add one thing to do today." },
   "allTasksComplete": { "message": "All of today's tasks are complete. Nice work." },
   "tasksRemainingStatus": { "message": "$ACTIVE$ remaining / $TOTAL$ total" },
+  "taskListLabel": { "message": "Today's task list" },
   "markTaskComplete": { "message": "Mark complete: $TASK$" },
   "markTaskIncomplete": { "message": "Mark incomplete: $TASK$" },
   "focusTaskButton": { "message": "Set as focus task" },
@@ -31,6 +32,7 @@
   "upgradeButton": { "message": "Upgrade to Premium" },
   "themeLabel": { "message": "Background color" },
   "historyTitle": { "message": "Completion history" },
+  "historyListLabel": { "message": "Completed task history" },
   "historyEmpty": { "message": "No completion history yet." },
   "historyItem": { "message": "$DATE$: $TASK$" },
   "premiumActive": { "message": "Premium active" }

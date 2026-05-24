@@ -106,7 +106,9 @@ function setupI18n() {
     setLocalizedText(upgradeLink, 'upgradeButton');
     setLocalizedText(themeLabel, 'themeLabel');
     themeColorInput.setAttribute('aria-label', chrome.i18n.getMessage('themeLabel'));
+    taskList.setAttribute('aria-label', chrome.i18n.getMessage('taskListLabel'));
     setLocalizedText(historyTitle, 'historyTitle');
+    historyList.setAttribute('aria-label', chrome.i18n.getMessage('historyListLabel'));
     setLocalizedText(premiumStatus, 'premiumActive');
     setTaskStatusMessage(chrome.i18n.getMessage('loadingTasks'), 'loading');
     taskList.setAttribute('aria-busy', 'true');

@@ -15,6 +15,7 @@
   "emptyTasks": { "message": "まだタスクはありません。今日やることを1つ追加しましょう。" },
   "allTasksComplete": { "message": "今日のタスクはすべて完了しました。お疲れさまです。" },
   "tasksRemainingStatus": { "message": "未完了 $ACTIVE$件 / 全 $TOTAL$件" },
+  "taskListLabel": { "message": "今日のタスクリスト" },
   "markTaskComplete": { "message": "完了にする: $TASK$" },
   "markTaskIncomplete": { "message": "未完了に戻す: $TASK$" },
   "focusTaskButton": { "message": "集中タスクにする" },
@@ -31,6 +32,7 @@
   "upgradeButton": { "message": "プレミアムにアップグレード" },
   "themeLabel": { "message": "背景色" },
   "historyTitle": { "message": "完了履歴" },
+  "historyListLabel": { "message": "完了したタスクの履歴" },
   "historyEmpty": { "message": "完了履歴はまだありません。" },
   "historyItem": { "message": "$DATE$: $TASK$" },
   "premiumActive": { "message": "プレミアム利用中" }
