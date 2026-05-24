@@ -20,6 +20,8 @@
     --warning-text: #713f12;
     --focus-ring: #1d4ed8;
     --focus-ring-shadow: rgba(29, 78, 216, 0.24);
+    --shadow-card: 0 24px 64px rgba(15, 23, 42, 0.12);
+    --shadow-item: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(15, 23, 42, 0.06);
 }
 
 * {
@@ -34,7 +36,8 @@ body {
     min-height: 100vh;
     margin: 0;
     background:
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.72), transparent 34rem),
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.78), transparent 34rem),
+        radial-gradient(circle at top right, rgba(219, 234, 254, 0.5), transparent 28rem),
         var(--page-bg);
     color: var(--text);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -84,22 +87,23 @@ a:focus-visible,
 .app-shell {
     width: 100%;
     min-height: 100vh;
-    padding: clamp(28px, 6vw, 64px) 16px;
+    padding: clamp(32px, 6vw, 72px) 16px;
 }
 
 .todo-card {
-    width: min(100%, 680px);
+    width: min(100%, 720px);
     margin: 0 auto;
-    padding: clamp(24px, 5vw, 40px);
+    padding: clamp(24px, 5vw, 42px);
     background: var(--surface);
     border: 1px solid var(--border-soft);
-    border-radius: 22px;
-    box-shadow: 0 22px 56px rgba(15, 23, 42, 0.12);
+    border-radius: 24px;
+    box-shadow: var(--shadow-card);
 }
 
 .app-title {
-    margin: 0 0 28px;
+    margin: 0 0 30px;
     font-size: clamp(28px, 5vw, 40px);
+    font-weight: 800;
     line-height: 1.15;
     letter-spacing: -0.04em;
 }
@@ -133,18 +137,19 @@ a:focus-visible,
     display: flex;
     gap: 12px;
     align-items: stretch;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .task-input {
     flex: 1;
     min-width: 0;
-    min-height: 52px;
-    padding: 13px 16px;
+    min-height: 54px;
+    padding: 14px 16px;
     color: var(--text);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
+    font-weight: 600;
 }
 
 .task-input:focus-visible {
@@ -167,7 +172,7 @@ a:focus-visible,
 }
 
 .add-button {
-    padding: 0 20px;
+    padding: 0 22px;
     color: #ffffff;
     background: var(--primary);
     border: 1px solid var(--primary);
@@ -180,36 +185,37 @@ a:focus-visible,
 }
 
 .onboarding-guide {
-    margin: -4px 0 18px;
-    padding: 12px 14px;
-    color: var(--text-muted);
-    background: #f8fbff;
-    border: 1px solid var(--border-soft);
+    margin: -2px 0 14px;
+    padding: 12px 16px;
+    color: #1e3a8a;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
 }
 
 .empty-state {
-    margin-bottom: 18px;
-    padding: clamp(20px, 4vw, 26px);
+    margin-bottom: 20px;
+    padding: clamp(22px, 4vw, 30px);
     background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
     border: 1px dashed #b7c6d8;
-    border-radius: 16px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 10px 28px rgba(15, 23, 42, 0.04);
 }
 
 .empty-state-title {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--text);
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.01em;
 }
 
 .empty-state-description {
-    margin: 0 0 12px;
+    margin: 0 0 14px;
     color: var(--text-muted);
+    font-size: 15px;
 }
 
 .empty-state-example {
@@ -225,10 +231,11 @@ a:focus-visible,
 
 .empty-state-steps {
     display: grid;
-    gap: 8px;
-    margin: 0 0 16px;
+    gap: 9px;
+    margin: 0 0 18px;
     padding-left: 1.35rem;
     color: var(--text-muted);
+    font-size: 15px;
 }
 
 .empty-state-steps li::marker {
@@ -253,18 +260,22 @@ a:focus-visible,
 
 .status-message {
     display: flex;
+    position: relative;
     align-items: center;
     gap: 10px;
-    min-height: 44px;
-    margin: 0 0 16px;
-    padding: 11px 14px;
+    min-height: 46px;
+    margin: 0 0 18px;
+    padding: 12px 14px 12px 16px;
+    overflow: hidden;
     color: var(--text-muted);
     background: var(--surface-muted);
     border: 1px solid var(--border-soft);
+    border-left-width: 4px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
     line-height: 1.35;
+    letter-spacing: 0.01em;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
@@ -280,6 +291,7 @@ a:focus-visible,
 .status-message[data-state="loading"] {
     color: #334155;
     background: #f8fafc;
+    border-color: #cbd5e1;
 }
 
 .status-message[data-state="empty"] {
@@ -309,19 +321,19 @@ a:focus-visible,
 
 .task-list {
     display: grid;
-    gap: 12px;
+    gap: 14px;
 }
 
 .task-item {
     display: grid;
     grid-template-columns: 52px minmax(0, 1fr) 52px 52px 52px minmax(70px, auto);
     align-items: center;
-    gap: 10px;
-    padding: 14px 14px 14px 10px;
+    gap: 12px;
+    padding: 15px 16px 15px 12px;
     background: var(--surface-raised);
     border: 1px solid var(--border);
     border-radius: 14px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+    box-shadow: var(--shadow-item);
 }
 
 .task-item:hover {
@@ -330,8 +342,18 @@ a:focus-visible,
 
 .task-item--completed {
     background: var(--surface-muted);
-    border-color: var(--border-soft);
+    border-color: #cbd5e1;
     box-shadow: none;
+}
+
+.task-item[aria-current="true"] {
+    background: #f8fbff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.18), var(--shadow-item);
+}
+
+.task-item[aria-current="true"] .task-text {
+    color: #1e3a8a;
 }
 
 .task-checkbox {
@@ -366,6 +388,7 @@ a:focus-visible,
 
 .task-item--completed .task-text {
     color: var(--text-muted);
+    font-weight: 500;
     text-decoration: line-through;
     text-decoration-thickness: 2px;
     text-decoration-color: #94a3b8;
@@ -418,9 +441,9 @@ a:focus-visible,
 }
 
 .task-action-button:disabled {
-    color: var(--text-subtle);
+    color: #64748b;
     background: var(--surface-muted);
-    border-color: #94a3b8;
+    border-color: #cbd5e1;
     cursor: default;
 }
 
@@ -553,6 +576,7 @@ a:focus-visible,
 
     .todo-card {
         border-radius: 18px;
+        padding-inline: 18px;
     }
 
     .task-entry {
@@ -567,7 +591,7 @@ a:focus-visible,
         grid-template-columns: 52px 52px minmax(0, 1fr);
         align-items: flex-start;
         gap: 8px 10px;
-        padding: 12px;
+        padding: 14px;
     }
 
     .task-text {
