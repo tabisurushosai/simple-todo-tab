@@ -13,7 +13,7 @@
   `tasks`, `last_date`, `trial_start_ts`, `is_premium`, `history`, `theme`。
 - 保存キーの一覧とキー判定は `TODO_STORAGE_KEYS` / `isTodoStorageKey` を使い、
   プラットフォーム別アダプタ内で独自のキー一覧を重複定義しない。
-- 変更通知をアダプタから UI へ渡すときは `selectTodoStorageChanges` で
+- 変更通知をアダプタから UI へ渡すときは `filterTodoStorageChanges` で
   Todo 用キーだけに絞り、Chrome やモバイル保存 API 固有の変更オブジェクトを
   UI / core 側へ漏らさない。
 - プラットフォーム別の保存実装は契約と同じ階層に置く。Chrome 拡張向けは
@@ -30,6 +30,9 @@
 - 保存は `TodoStorageAdapter` を実装したモジュールに閉じ込める。モバイル版では
   SQLite、Key-Value Store、ファイル保存などを使ってよいが、アプリ側へ見せる
   キーと JSON 互換の値形式は Chrome 版と同じにする。
+- adapter の外へ公開する型は `TodoStorageValues` / `TodoStoragePatch` /
+  `TodoStorageChanges` に揃える。ネイティブ保存 API が返す独自のイベント型は、
+  adapter 内で `TodoStorageChanges` へ変換してから UI へ通知する。
 - UI は起動時に利用する storage アダプタを 1 箇所で選ぶ。画面コンポーネント内に
   `chrome.storage` やモバイル固有の保存 API を直接書かない。
 - `subscribe` は別画面・別プロセスから変更通知を受けられる環境では通知を橋渡しし、
@@ -42,7 +45,7 @@
 3. `get` は要求されたキーだけを読み、未保存のキーは `undefined` のまま返す。
 4. `set` は渡されたキーだけを更新し、既存の保存形式を変換しない。
 5. `subscribe` は `TodoStorageChanges` 形式へ変換して通知する。変更元 API が
-   余分なキーを返す場合は `selectTodoStorageChanges` で除外する。
+   余分なキーを返す場合は `filterTodoStorageChanges` で除外する。
 6. オフライン前提を変える別判断がない限り、保存は端末ローカルに閉じる。
 7. Chrome 版に remote code、外部 CDN / 外部フォント、`eval`、新しい権限を
    追加しない。
