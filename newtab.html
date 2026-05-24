@@ -16,13 +16,13 @@
                 <div id="focus-text" class="focus-text"></div>
             </div>
 
-            <form id="task-entry" class="task-entry" aria-describedby="onboarding-guide task-status">
+            <form id="task-entry" class="task-entry" aria-describedby="task-status">
                 <label id="task-input-label" class="visually-hidden" for="task-input">今日やることを入力</label>
                 <input type="text" id="task-input" class="task-input" placeholder="何をしますか？" autocomplete="off" aria-labelledby="task-input-label">
                 <button id="add-button" class="add-button" type="submit" aria-controls="task-list">追加</button>
             </form>
 
-            <div id="onboarding-guide" class="onboarding-guide" role="note">はじめてなら、今日やることを1つだけ書いて追加しましょう。</div>
+            <div id="onboarding-guide" class="onboarding-guide" role="note" hidden>はじめてなら、今日やることを1つだけ書いて追加しましょう。</div>
             <div id="empty-state" class="empty-state" hidden>
                 <div id="empty-state-title" class="empty-state-title">まだやることはありません</div>
                 <p id="empty-state-description" class="empty-state-description">今日やることを短く書くと、このタブがシンプルなチェックリストになります。</p>

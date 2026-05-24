@@ -399,6 +399,7 @@ function renderTasks(tasks: Task[]) {
     const isEmpty = tasks.length === 0;
     onboardingGuide.hidden = !isEmpty;
     emptyState.hidden = !isEmpty;
+    taskEntryForm.setAttribute('aria-describedby', isEmpty ? 'onboarding-guide task-status' : 'task-status');
     const focusedTask = tasks.find(t => t.focused);
     if (focusedTask && !focusedTask.completed) {
         focusContainer.style.display = 'block';
