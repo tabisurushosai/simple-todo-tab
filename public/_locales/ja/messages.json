@@ -9,6 +9,7 @@
   "onboardingGuide": { "message": "はじめてなら、今日やることを1つだけ入力して追加しましょう。" },
   "emptyStateTitle": { "message": "まだやることはありません" },
   "emptyStateDescription": { "message": "今日やることを短く書くと、このタブがシンプルなチェックリストになります。" },
+  "emptyStateExample": { "message": "迷ったら「10分だけ片づける」のように、小さな1つから始めましょう。" },
   "emptyStateStepInput": { "message": "入力欄に、今思い浮かぶことを1つ書きます。" },
   "emptyStateStepReturn": { "message": "追加後は、新しいタブを開くたびに確認できます。" },
   "emptyStateAction": { "message": "入力欄に移動" },

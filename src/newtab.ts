@@ -31,6 +31,7 @@ type I18nMessageName =
     | 'deleteTaskButtonForTask'
     | 'emptyStateAction'
     | 'emptyStateDescription'
+    | 'emptyStateExample'
     | 'emptyStateStepInput'
     | 'emptyStateStepReturn'
     | 'emptyStateTitle'
@@ -107,6 +108,7 @@ const onboardingGuide = getRequiredElement('onboarding-guide', HTMLDivElement);
 const emptyState = getRequiredElement('empty-state', HTMLDivElement);
 const emptyStateTitle = getRequiredElement('empty-state-title', HTMLDivElement);
 const emptyStateDescription = getRequiredElement('empty-state-description', HTMLParagraphElement);
+const emptyStateExample = getRequiredElement('empty-state-example', HTMLParagraphElement);
 const emptyStateStepInput = getRequiredElement('empty-state-step-input', HTMLLIElement);
 const emptyStateStepReturn = getRequiredElement('empty-state-step-return', HTMLLIElement);
 const emptyStateAction = getRequiredElement('empty-state-action', HTMLButtonElement);
@@ -182,6 +184,7 @@ function setupI18n() {
     setLocalizedText(onboardingGuide, 'onboardingGuide');
     setLocalizedText(emptyStateTitle, 'emptyStateTitle');
     setLocalizedText(emptyStateDescription, 'emptyStateDescription');
+    setLocalizedText(emptyStateExample, 'emptyStateExample');
     setLocalizedText(emptyStateStepInput, 'emptyStateStepInput');
     setLocalizedText(emptyStateStepReturn, 'emptyStateStepReturn');
     setLocalizedText(emptyStateAction, 'emptyStateAction');

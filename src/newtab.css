@@ -212,6 +212,17 @@ a:focus-visible,
     color: var(--text-muted);
 }
 
+.empty-state-example {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    color: var(--text-subtle);
+    background: #eff6ff;
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .empty-state-steps {
     display: grid;
     gap: 8px;
