@@ -10,7 +10,8 @@ import {
     type HistoryItem,
     type Task,
 } from './core/tasks';
-import { chromeTodoStorage } from './storage/chromeTodoStorage';
+import { createChromeTodoStorage } from './storage/chromeTodoStorage';
+import type { TodoStorageAdapter } from './storage/todoStorage';
 
 type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
 type TaskFocusControl = TaskControl | 'item';
@@ -21,6 +22,7 @@ type PendingFocusTarget =
 
 let pendingFocusTarget: PendingFocusTarget | null = null;
 type SupportedLocale = 'ja' | 'en';
+const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
 
 function getRequiredElement<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -353,7 +355,7 @@ function renderTasks(tasks: Task[]) {
 }
 
 async function loadTasks() {
-    const result = await chromeTodoStorage.get(['tasks', 'last_date', 'trial_start_ts', 'is_premium', 'history', 'theme']);
+    const result = await todoStorage.get(['tasks', 'last_date', 'trial_start_ts', 'is_premium', 'history', 'theme']);
     const today = getTodayString();
     const lastDate = result.last_date;
     let trialStartTs = result.trial_start_ts;
@@ -363,7 +365,7 @@ async function loadTasks() {
 
     if (!trialStartTs) {
         trialStartTs = Date.now();
-        void chromeTodoStorage.set({ trial_start_ts: trialStartTs });
+        void todoStorage.set({ trial_start_ts: trialStartTs });
     }
 
     document.body.style.backgroundColor = theme;
@@ -378,36 +380,36 @@ async function loadTasks() {
     if (lastDate && lastDate !== today) {
         // Date changed: carry over incomplete, reset completed
         tasks = removeCompletedTasks(tasks);
-        await chromeTodoStorage.set({ tasks, last_date: today });
+        await todoStorage.set({ tasks, last_date: today });
         renderTasks(tasks);
     } else {
         if (!lastDate) {
-            void chromeTodoStorage.set({ last_date: today });
+            void todoStorage.set({ last_date: today });
         }
         renderTasks(tasks);
     }
 }
 
 async function moveTask(index: number, direction: -1 | 1) {
-    const result = await chromeTodoStorage.get(['tasks']);
+    const result = await todoStorage.get(['tasks']);
     const tasks = normalizeTasks(result.tasks);
     const newTasks = moveTaskInList(tasks, index, direction);
     if (newTasks) {
-        await chromeTodoStorage.set({ tasks: newTasks });
+        await todoStorage.set({ tasks: newTasks });
         renderTasks(newTasks);
     }
 }
 
 async function deleteTask(index: number) {
-    const result = await chromeTodoStorage.get(['tasks']);
+    const result = await todoStorage.get(['tasks']);
     const tasks = normalizeTasks(result.tasks);
     const newTasks = deleteTaskAt(tasks, index);
-    await chromeTodoStorage.set({ tasks: newTasks });
+    await todoStorage.set({ tasks: newTasks });
     renderTasks(newTasks);
 }
 
 async function toggleTask(index: number) {
-    const result = await chromeTodoStorage.get(['tasks', 'is_premium', 'history']);
+    const result = await todoStorage.get(['tasks', 'is_premium', 'history']);
     const tasks = normalizeTasks(result.tasks);
     const isPremium = !!result.is_premium;
     const history = result.history || [];
@@ -418,18 +420,18 @@ async function toggleTask(index: number) {
             ? [...history, { text: toggled.completedTask.text, completed_at: Date.now() }]
             : history;
 
-        await chromeTodoStorage.set({ tasks: toggled.tasks, history: newHistory.slice(-100) });
+        await todoStorage.set({ tasks: toggled.tasks, history: newHistory.slice(-100) });
         renderTasks(toggled.tasks);
         if (isPremium) renderHistory(newHistory);
     }
 }
 
 async function toggleFocus(index: number) {
-    const result = await chromeTodoStorage.get(['tasks']);
+    const result = await todoStorage.get(['tasks']);
     const tasks = normalizeTasks(result.tasks);
     const newTasks = toggleTaskFocus(tasks, index);
     if (newTasks) {
-        await chromeTodoStorage.set({ tasks: newTasks });
+        await todoStorage.set({ tasks: newTasks });
         renderTasks(newTasks);
     }
 }
@@ -438,10 +440,10 @@ async function addTask() {
     const text = taskInput.value.trim();
     if (!text) return;
 
-    const result = await chromeTodoStorage.get(['tasks']);
+    const result = await todoStorage.get(['tasks']);
     const tasks = normalizeTasks(result.tasks);
     const newTasks: Task[] = [...tasks, createTask(text)];
-    await chromeTodoStorage.set({ tasks: newTasks });
+    await todoStorage.set({ tasks: newTasks });
     taskInput.value = '';
     renderTasks(newTasks);
 }
@@ -457,12 +459,12 @@ emptyStateAction.addEventListener('click', () => {
 
 themeColorInput.addEventListener('change', () => {
     const theme = themeColorInput.value;
-    void chromeTodoStorage.set({ theme }).then(() => {
+    void todoStorage.set({ theme }).then(() => {
         document.body.style.backgroundColor = theme;
     });
 });
 
-chromeTodoStorage.subscribe((changes) => {
+todoStorage.subscribe((changes) => {
     if (changes.tasks || changes.last_date || changes.is_premium || changes.theme) {
         void loadTasks();
     }

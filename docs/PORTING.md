@@ -17,9 +17,21 @@
   `chrome.storage` のようなブラウザ拡張 API は、別シェルで差し替えやすいよう
   プラットフォーム端に寄せる。
 
+## iOS / Android シェルで差し替えるもの
+
+- `src/core` はそのまま再利用し、アプリシェルから直接プラットフォーム API を
+  渡さない。タスクの作成、正規化、並べ替え、完了切替などは core 関数だけで行う。
+- 保存は `TodoStorageAdapter` を実装したモジュールに閉じ込める。モバイル版では
+  SQLite、Key-Value Store、ファイル保存などを使ってよいが、アプリ側へ見せる
+  キーと JSON 互換の値形式は Chrome 版と同じにする。
+- UI は起動時に利用する storage アダプタを 1 箇所で選ぶ。画面コンポーネント内に
+  `chrome.storage` やモバイル固有の保存 API を直接書かない。
+- `subscribe` は別画面・別プロセスから変更通知を受けられる環境では通知を橋渡しし、
+  単一画面で不要な場合も同じ関数形の no-op unsubscribe を返す実装にする。
+
 ## storage アダプタ追加時のチェックリスト
 
-1. `TodoStorage` の `get`, `set`, `subscribe` を実装する。
+1. `TodoStorageAdapter` の `get`, `set`, `subscribe` を実装する。
 2. 保存キーと JSON 互換の値形式を維持する。
 3. オフライン前提を変える別判断がない限り、保存は端末ローカルに閉じる。
 4. Chrome 版に remote code、外部 CDN / 外部フォント、`eval`、新しい権限を

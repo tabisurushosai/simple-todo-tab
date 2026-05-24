@@ -29,9 +29,13 @@ export type TodoStorageChanges = {
 };
 export type TodoStorageChangeListener = (changes: TodoStorageChanges) => void;
 export type TodoStorageUnsubscribe = () => void;
+export type TodoStorageSelection<K extends TodoStorageKey> = Pick<TodoStorageValues, K>;
+export type TodoStoragePatch = Partial<TodoStorageValues>;
 
-export interface TodoStorage {
-    get<K extends TodoStorageKey>(keys: readonly K[]): Promise<Pick<TodoStorageValues, K>>;
-    set(values: Partial<TodoStorageValues>): Promise<void>;
+export interface TodoStorageAdapter {
+    get<K extends TodoStorageKey>(keys: readonly K[]): Promise<TodoStorageSelection<K>>;
+    set(values: TodoStoragePatch): Promise<void>;
     subscribe(listener: TodoStorageChangeListener): TodoStorageUnsubscribe;
 }
+
+export type TodoStorage = TodoStorageAdapter;
