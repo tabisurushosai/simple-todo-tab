@@ -1,21 +1,21 @@
 {
   "extName": { "message": "きょうのことだけ" },
-  "extDesc": { "message": "新しいタブに今日のやることだけを大きく表示し、今やる1つに集中できます。" },
+  "extDesc": { "message": "新しいタブに今日やることだけを表示し、今やる1つに集中できます。" },
   "title": { "message": "今日のやること" },
   "focusLabel": { "message": "今、集中すること" },
-  "taskInputLabel": { "message": "今日やることを入力" },
+  "taskInputLabel": { "message": "今日やることの入力欄" },
   "inputPlaceholder": { "message": "何をしますか？" },
   "addButton": { "message": "追加" },
-  "onboardingGuide": { "message": "はじめてなら、今日やることを1つだけ書いて追加しましょう。" },
+  "onboardingGuide": { "message": "はじめてなら、今日やることを1つだけ入力して追加しましょう。" },
   "emptyStateTitle": { "message": "まだやることはありません" },
   "emptyStateDescription": { "message": "今日やることを短く書くと、このタブがシンプルなチェックリストになります。" },
-  "emptyStateStepInput": { "message": "入力欄に、今思い浮かぶ1つを書きます。" },
-  "emptyStateStepReturn": { "message": "追加したら、新しいタブでいつでも確認できます。" },
+  "emptyStateStepInput": { "message": "入力欄に、今思い浮かぶことを1つ書きます。" },
+  "emptyStateStepReturn": { "message": "追加後は、新しいタブを開くたびに確認できます。" },
   "emptyStateAction": { "message": "入力欄に移動" },
   "deleteButton": { "message": "削除" },
   "loadingTasks": { "message": "読み込み中..." },
   "emptyTasks": { "message": "まだやることはありません。今日やることを1つ追加しましょう。" },
-  "allTasksComplete": { "message": "今日のタスクはすべて完了しました。お疲れさまです。" },
+  "allTasksComplete": { "message": "今日のやることはすべて完了しました。お疲れさまです。" },
   "tasksRemainingStatus": {
     "message": "残り$ACTIVE$$ACTIVE_TASK_LABEL$ / 全$TOTAL$$TOTAL_TASK_LABEL$",
     "placeholders": {
@@ -57,18 +57,18 @@
     "placeholders": { "task": { "content": "$1" } }
   },
   "premiumGate": {
-    "message": "試用期間はあと$DAYS$日です。プレミアムにすると背景色と完了履歴を使えます。",
+    "message": "試用期間は残り$DAYS$日です。プレミアムにすると背景色の変更と完了履歴を使えます。",
     "placeholders": { "days": { "content": "$1" } }
   },
   "premiumGateOneDay": {
-    "message": "試用期間はあと$DAYS$日です。プレミアムにすると背景色と完了履歴を使えます。",
+    "message": "試用期間は残り$DAYS$日です。プレミアムにすると背景色の変更と完了履歴を使えます。",
     "placeholders": { "days": { "content": "$1" } }
   },
-  "premiumGateExpired": { "message": "試用期間は終了しました。プレミアムにすると背景色と完了履歴を使えます。" },
+  "premiumGateExpired": { "message": "試用期間は終了しました。プレミアムにすると背景色の変更と完了履歴を使えます。" },
   "upgradeButton": { "message": "プレミアムにアップグレード" },
   "themeLabel": { "message": "背景色" },
   "historyTitle": { "message": "完了履歴" },
-  "historyListLabel": { "message": "完了したタスクの履歴" },
+  "historyListLabel": { "message": "完了履歴の一覧" },
   "historyEmpty": { "message": "完了履歴はまだありません。" },
   "historyItem": {
     "message": "$DATE$：$TASK$",
