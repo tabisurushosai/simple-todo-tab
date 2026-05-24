@@ -71,6 +71,8 @@ type PendingFocusTarget =
 let pendingFocusTarget: PendingFocusTarget | null = null;
 type SupportedLocale = 'ja' | 'en';
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
+const taskControls = ['checkbox', 'focus', 'move-up', 'move-down', 'delete'] as const satisfies readonly TaskControl[];
+const taskNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
 
 function getRequiredElement<T extends HTMLElement>(
     id: string,
@@ -213,6 +215,29 @@ function queueInputFocus() {
     pendingFocusTarget = { type: 'input' };
 }
 
+function getTaskFocusSelectors(target: { control: TaskFocusControl; index: number }): string[] {
+    return target.control === 'item'
+        ? [`li[data-task-index="${target.index}"]`]
+        : [
+            `[data-task-control="${target.control}"][data-task-index="${target.index}"]`,
+            `li[data-task-index="${target.index}"]`,
+        ];
+}
+
+function focusTaskTarget(target: { control: TaskFocusControl; index: number }): boolean {
+    for (const selector of getTaskFocusSelectors(target)) {
+        const element = taskList.querySelector<HTMLElement>(selector);
+        if (!element) continue;
+        if (element instanceof HTMLButtonElement && element.disabled) continue;
+        if (element instanceof HTMLInputElement && element.disabled) continue;
+
+        element.focus({ preventScroll: true });
+        return true;
+    }
+
+    return false;
+}
+
 function focusPendingTarget() {
     if (!pendingFocusTarget) return;
 
@@ -224,24 +249,70 @@ function focusPendingTarget() {
         return;
     }
 
-    const selectors = target.control === 'item'
-        ? [`li[data-task-index="${target.index}"]`]
-        : [
-            `[data-task-control="${target.control}"][data-task-index="${target.index}"]`,
-            `li[data-task-index="${target.index}"]`,
-        ];
-
-    for (const selector of selectors) {
-        const element = taskList.querySelector<HTMLElement>(selector);
-        if (!element) continue;
-        if (element instanceof HTMLButtonElement && element.disabled) continue;
-        if (element instanceof HTMLInputElement && element.disabled) continue;
-
-        element.focus({ preventScroll: true });
+    if (focusTaskTarget(target)) {
         return;
     }
 
     taskInput.focus({ preventScroll: true });
+}
+
+function isTaskControl(value: string | undefined): value is TaskControl {
+    return taskControls.includes(value as TaskControl);
+}
+
+function isTaskNavigationKey(value: string): value is typeof taskNavigationKeys[number] {
+    return taskNavigationKeys.includes(value as typeof taskNavigationKeys[number]);
+}
+
+function getTaskIndexFromElement(element: HTMLElement): number | null {
+    const taskElement = element.closest<HTMLElement>('li[data-task-index]');
+    const rawIndex = taskElement?.dataset.taskIndex;
+    if (rawIndex === undefined) {
+        return null;
+    }
+
+    const index = Number(rawIndex);
+    return Number.isInteger(index) && index >= 0 ? index : null;
+}
+
+function getTaskControlFromElement(element: HTMLElement): TaskFocusControl {
+    const control = element.dataset.taskControl;
+    return isTaskControl(control) ? control : 'item';
+}
+
+function getKeyboardTargetIndex(key: typeof taskNavigationKeys[number], currentIndex: number, taskCount: number): number {
+    switch (key) {
+        case 'ArrowUp':
+            return Math.max(0, currentIndex - 1);
+        case 'ArrowDown':
+            return Math.min(taskCount - 1, currentIndex + 1);
+        case 'Home':
+            return 0;
+        case 'End':
+            return taskCount - 1;
+    }
+}
+
+function handleTaskListKeydown(event: KeyboardEvent) {
+    if (!isTaskNavigationKey(event.key) || !(event.target instanceof HTMLElement)) {
+        return;
+    }
+
+    const currentIndex = getTaskIndexFromElement(event.target);
+    if (currentIndex === null) {
+        return;
+    }
+
+    const taskCount = taskList.querySelectorAll('li[data-task-index]').length;
+    if (taskCount === 0) {
+        return;
+    }
+
+    event.preventDefault();
+    focusTaskTarget({
+        control: getTaskControlFromElement(event.target),
+        index: getKeyboardTargetIndex(event.key, currentIndex, taskCount),
+    });
 }
 
 function renderHistory(history: HistoryItem[]) {
@@ -331,6 +402,7 @@ function createMoveTaskButton({
     button.textContent = textContent;
     button.className = 'task-action-button';
     button.setAttribute('aria-label', taskMessage(messageName, task.text));
+    button.setAttribute('aria-disabled', disabled.toString());
     setTaskControlAttributes(button, control, index);
     button.disabled = disabled;
     button.addEventListener('click', () => {
@@ -360,6 +432,8 @@ function renderTasks(tasks: Task[]) {
         li.className = `task-item${task.completed ? ' task-item--completed' : ''}`;
         li.tabIndex = -1;
         li.setAttribute('data-task-index', index.toString());
+        li.setAttribute('aria-posinset', (index + 1).toString());
+        li.setAttribute('aria-setsize', tasks.length.toString());
 
         const checkboxLabel = document.createElement('label');
         checkboxLabel.className = 'task-checkbox-target';
@@ -377,7 +451,9 @@ function renderTasks(tasks: Task[]) {
 
         const span = document.createElement('span');
         span.textContent = task.text;
+        span.id = `task-${index}-text`;
         span.className = 'task-text';
+        li.setAttribute('aria-labelledby', span.id);
 
         const focusButton = document.createElement('button');
         focusButton.type = 'button';
@@ -544,6 +620,8 @@ taskEntryForm.addEventListener('submit', (event) => {
 emptyStateAction.addEventListener('click', () => {
     taskInput.focus();
 });
+
+taskList.addEventListener('keydown', handleTaskListKeydown);
 
 themeColorInput.addEventListener('change', () => {
     const theme = themeColorInput.value;
