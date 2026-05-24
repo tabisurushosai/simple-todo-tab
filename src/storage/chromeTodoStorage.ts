@@ -1,9 +1,9 @@
 import type {
-    TodoStorage,
+    TodoStorageAdapter,
     TodoStorageChangeListener,
     TodoStorageChanges,
     TodoStorageKey,
-    TodoStorageValues,
+    TodoStorageSelection,
 } from './todoStorage';
 import { TODO_STORAGE_KEYS } from './todoStorage';
 
@@ -11,12 +11,12 @@ function isTodoStorageKey(key: string): key is TodoStorageKey {
     return (TODO_STORAGE_KEYS as readonly string[]).includes(key);
 }
 
-export function createChromeTodoStorage(): TodoStorage {
+export function createChromeTodoStorage(): TodoStorageAdapter {
     return {
         get<K extends TodoStorageKey>(keys: readonly K[]) {
-            return new Promise<Pick<TodoStorageValues, K>>(resolve => {
+            return new Promise<TodoStorageSelection<K>>(resolve => {
                 chrome.storage.local.get([...keys], result => {
-                    resolve(result as Pick<TodoStorageValues, K>);
+                    resolve(result as TodoStorageSelection<K>);
                 });
             });
         },
@@ -51,5 +51,3 @@ export function createChromeTodoStorage(): TodoStorage {
         },
     };
 }
-
-export const chromeTodoStorage = createChromeTodoStorage();
