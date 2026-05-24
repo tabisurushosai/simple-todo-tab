@@ -31,10 +31,17 @@ export interface TodoStorageChange<T = unknown> {
 export type TodoStorageChanges = {
     [K in TodoStorageKey]?: TodoStorageChange<TodoStorageValues[K]>;
 };
+export type TodoStorageChangeSet = Record<string, TodoStorageChange>;
 export type TodoStorageChangeListener = (changes: TodoStorageChanges) => void;
 export type TodoStorageUnsubscribe = () => void;
 export type TodoStorageSelection<K extends TodoStorageKey> = Pick<TodoStorageValues, K>;
 export type TodoStoragePatch = Partial<TodoStorageValues>;
+
+export function selectTodoStorageChanges(changes: TodoStorageChangeSet): TodoStorageChanges {
+    return Object.fromEntries(
+        Object.entries(changes).filter(([key]) => isTodoStorageKey(key)),
+    ) as TodoStorageChanges;
+}
 
 /**
  * Platform storage port used by UI code.
