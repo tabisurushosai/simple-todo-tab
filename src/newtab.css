@@ -12,6 +12,8 @@
     --primary-soft: #dbeafe;
     --danger: #b91c1c;
     --danger-soft: #fee2e2;
+    --success: #166534;
+    --success-soft: #dcfce7;
     --warning-bg: #fff7d6;
     --warning-text: #713f12;
     --focus-ring: #1d4ed8;
@@ -28,7 +30,9 @@ html {
 body {
     min-height: 100vh;
     margin: 0;
-    background: var(--page-bg);
+    background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.72), transparent 34rem),
+        var(--page-bg);
     color: var(--text);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: 16px;
@@ -70,15 +74,15 @@ a:focus-visible,
 .todo-card {
     width: min(100%, 680px);
     margin: 0 auto;
-    padding: clamp(24px, 5vw, 36px);
+    padding: clamp(24px, 5vw, 40px);
     background: var(--surface);
     border: 1px solid var(--border-soft);
-    border-radius: 18px;
-    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+    border-radius: 22px;
+    box-shadow: 0 22px 56px rgba(15, 23, 42, 0.12);
 }
 
 .app-title {
-    margin: 0 0 24px;
+    margin: 0 0 28px;
     font-size: clamp(28px, 5vw, 40px);
     line-height: 1.15;
     letter-spacing: -0.04em;
@@ -111,19 +115,24 @@ a:focus-visible,
 
 .task-entry {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 18px;
 }
 
 .task-input {
     flex: 1;
     min-width: 0;
-    min-height: 44px;
-    padding: 12px 14px;
+    min-height: 48px;
+    padding: 12px 16px;
     color: var(--text);
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
+}
+
+.task-input:focus-visible {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.14);
 }
 
 .task-input::placeholder {
@@ -133,8 +142,8 @@ a:focus-visible,
 .add-button,
 .task-action-button,
 .delete-button {
-    min-height: 44px;
-    border-radius: 10px;
+    min-height: 48px;
+    border-radius: 12px;
     cursor: pointer;
     transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
@@ -153,17 +162,17 @@ a:focus-visible,
 }
 
 .onboarding-guide {
-    margin: -4px 0 14px;
+    margin: -2px 0 16px;
     color: var(--text-muted);
     font-size: 14px;
 }
 
 .empty-state {
-    margin-bottom: 12px;
-    padding: 18px;
-    background: linear-gradient(180deg, #ffffff 0%, var(--surface-muted) 100%);
-    border: 1px solid var(--border-soft);
-    border-radius: 14px;
+    margin-bottom: 14px;
+    padding: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px dashed #b7c6d8;
+    border-radius: 16px;
 }
 
 .empty-state-title {
@@ -196,13 +205,49 @@ a:focus-visible,
 }
 
 .status-message {
-    margin: 0 0 12px;
-    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px;
+    padding: 11px 13px;
     color: var(--text-muted);
     background: var(--surface-muted);
     border: 1px solid var(--border-soft);
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 14px;
+    font-weight: 700;
+}
+
+.status-message::before {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: currentColor;
+    content: "";
+}
+
+.status-message[data-state="loading"] {
+    color: #334155;
+    background: #f8fafc;
+}
+
+.status-message[data-state="empty"] {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    border-color: #fde68a;
+}
+
+.status-message[data-state="active"] {
+    color: var(--primary);
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.status-message[data-state="complete"] {
+    color: var(--success);
+    background: var(--success-soft);
+    border-color: #86efac;
 }
 
 .task-list,
@@ -214,21 +259,23 @@ a:focus-visible,
 
 .task-list {
     display: grid;
-    gap: 10px;
+    gap: 12px;
 }
 
 .task-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px;
+    gap: 12px;
+    padding: 14px;
     background: var(--surface);
-    border: 1px solid var(--border-soft);
-    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .task-item--completed {
     background: var(--surface-muted);
+    border-color: var(--border-soft);
 }
 
 .task-checkbox {
@@ -245,8 +292,8 @@ a:focus-visible,
 
 .task-checkbox-target {
     display: inline-grid;
-    width: 44px;
-    min-height: 44px;
+    width: 48px;
+    min-height: 48px;
     flex: 0 0 auto;
     place-items: center;
     cursor: pointer;
@@ -256,6 +303,8 @@ a:focus-visible,
     flex: 1;
     min-width: 0;
     overflow-wrap: anywhere;
+    color: var(--text);
+    font-size: 17px;
     font-weight: 600;
 }
 
@@ -272,8 +321,8 @@ a:focus-visible,
 }
 
 .icon-button {
-    width: 44px;
-    min-height: 44px;
+    width: 48px;
+    min-height: 48px;
     padding: 0;
     color: var(--text-muted);
     border: 1px solid transparent;
@@ -290,7 +339,7 @@ a:focus-visible,
 }
 
 .task-action-button {
-    width: 44px;
+    width: 48px;
     padding: 0;
     color: var(--text-muted);
     border: 1px solid var(--border);
@@ -310,7 +359,7 @@ a:focus-visible,
 }
 
 .delete-button {
-    padding: 0 12px;
+    padding: 0 14px;
     color: var(--danger);
     border: 1px solid #fecaca;
     font-size: 14px;
@@ -425,6 +474,6 @@ a:focus-visible,
     }
 
     .task-text {
-        flex-basis: calc(100% - 54px);
+        flex-basis: calc(100% - 60px);
     }
 }
