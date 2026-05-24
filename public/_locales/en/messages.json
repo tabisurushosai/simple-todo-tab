@@ -16,25 +16,66 @@
   "loadingTasks": { "message": "Loading tasks..." },
   "emptyTasks": { "message": "No tasks yet. Add one thing to do today." },
   "allTasksComplete": { "message": "All of today's tasks are complete. Nice work." },
-  "tasksRemainingStatus": { "message": "$ACTIVE$ $ACTIVE_TASK_LABEL$ remaining / $TOTAL$ $TOTAL_TASK_LABEL$ total" },
+  "tasksRemainingStatus": {
+    "message": "$ACTIVE$ $ACTIVE_TASK_LABEL$ remaining / $TOTAL$ $TOTAL_TASK_LABEL$ total",
+    "placeholders": {
+      "active": { "content": "$1" },
+      "active_task_label": { "content": "$2" },
+      "total": { "content": "$3" },
+      "total_task_label": { "content": "$4" }
+    }
+  },
   "taskCountSingular": { "message": "task" },
   "taskCountPlural": { "message": "tasks" },
   "taskListLabel": { "message": "Today's task list" },
-  "markTaskComplete": { "message": "Mark complete: $TASK$" },
-  "markTaskIncomplete": { "message": "Mark as incomplete: $TASK$" },
-  "focusTaskButtonForTask": { "message": "Set as focus task: $TASK$" },
-  "clearFocusTaskButtonForTask": { "message": "Clear focus task: $TASK$" },
-  "moveTaskUpForTask": { "message": "Move up: $TASK$" },
-  "moveTaskDownForTask": { "message": "Move down: $TASK$" },
-  "deleteTaskButtonForTask": { "message": "Delete: $TASK$" },
-  "premiumGate": { "message": "Trial ends in $DAYS$ days. Upgrade to Premium to use background color and completion history." },
-  "premiumGateOneDay": { "message": "Trial ends in $DAYS$ day. Upgrade to Premium to use background color and completion history." },
+  "markTaskComplete": {
+    "message": "Mark complete: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "markTaskIncomplete": {
+    "message": "Mark as incomplete: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "focusTaskButtonForTask": {
+    "message": "Set as focus task: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "clearFocusTaskButtonForTask": {
+    "message": "Clear focus task: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "moveTaskUpForTask": {
+    "message": "Move up: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "moveTaskDownForTask": {
+    "message": "Move down: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "deleteTaskButtonForTask": {
+    "message": "Delete: $TASK$",
+    "placeholders": { "task": { "content": "$1" } }
+  },
+  "premiumGate": {
+    "message": "Trial ends in $DAYS$ days. Upgrade to Premium to use background color and completion history.",
+    "placeholders": { "days": { "content": "$1" } }
+  },
+  "premiumGateOneDay": {
+    "message": "Trial ends in $DAYS$ day. Upgrade to Premium to use background color and completion history.",
+    "placeholders": { "days": { "content": "$1" } }
+  },
   "premiumGateExpired": { "message": "Trial has ended. Upgrade to Premium to use background color and completion history." },
   "upgradeButton": { "message": "Upgrade to Premium" },
   "themeLabel": { "message": "Background color" },
   "historyTitle": { "message": "Completion history" },
   "historyListLabel": { "message": "Completed task history" },
   "historyEmpty": { "message": "No completion history yet." },
-  "historyItem": { "message": "$DATE$: $TASK$" },
+  "historyItem": {
+    "message": "$DATE$: $TASK$",
+    "placeholders": {
+      "date": { "content": "$1" },
+      "task": { "content": "$2" }
+    }
+  },
   "premiumActive": { "message": "Premium active" }
 }

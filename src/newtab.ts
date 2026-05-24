@@ -139,11 +139,25 @@ function getMessage(messageName: I18nMessageName): string {
     return chrome.i18n.getMessage(messageName);
 }
 
+const i18nPlaceholderOrder: Partial<Record<I18nMessageName, readonly string[]>> = {
+    clearFocusTaskButtonForTask: ['TASK'],
+    deleteTaskButtonForTask: ['TASK'],
+    focusTaskButtonForTask: ['TASK'],
+    historyItem: ['DATE', 'TASK'],
+    markTaskComplete: ['TASK'],
+    markTaskIncomplete: ['TASK'],
+    moveTaskDownForTask: ['TASK'],
+    moveTaskUpForTask: ['TASK'],
+    premiumGate: ['DAYS'],
+    premiumGateOneDay: ['DAYS'],
+    tasksRemainingStatus: ['ACTIVE', 'ACTIVE_TASK_LABEL', 'TOTAL', 'TOTAL_TASK_LABEL'],
+};
+
 function i18nMessage(messageName: I18nMessageName, replacements: Record<string, string> = {}): string {
-    return Object.entries(replacements).reduce(
-        (message, [key, value]) => message.replace(`$${key}$`, value),
-        getMessage(messageName),
-    );
+    const placeholderOrder = i18nPlaceholderOrder[messageName] ?? Object.keys(replacements);
+    const substitutions = placeholderOrder.map((key) => replacements[key] ?? '');
+
+    return chrome.i18n.getMessage(messageName, substitutions);
 }
 
 function setLocalizedText(element: HTMLElement, messageName: I18nMessageName) {
