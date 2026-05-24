@@ -22,6 +22,13 @@
                 <button id="add-button" class="add-button" type="submit" aria-controls="task-list">追加</button>
             </form>
 
+            <div id="onboarding-guide" class="onboarding-guide" role="note">まず1つだけ書いて追加。新しいタブで今日やることにすぐ戻れます。</div>
+            <div id="empty-state" class="empty-state" hidden>
+                <div id="empty-state-title" class="empty-state-title">まだ何もありません</div>
+                <p id="empty-state-description" class="empty-state-description">今日やることを短く書くと、このタブがシンプルなチェックリストになります。</p>
+                <button id="empty-state-action" class="empty-state-action" type="button">入力欄に移動</button>
+            </div>
+
             <div id="task-status" class="status-message" role="status" aria-live="polite">読み込み中...</div>
             <ul id="task-list" class="task-list" aria-describedby="task-status"></ul>
 

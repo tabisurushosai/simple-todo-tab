@@ -24,6 +24,11 @@ const taskEntryForm = document.getElementById('task-entry') as HTMLFormElement;
 const taskInputLabel = document.getElementById('task-input-label') as HTMLLabelElement;
 const taskInput = document.getElementById('task-input') as HTMLInputElement;
 const addButton = document.getElementById('add-button') as HTMLButtonElement;
+const onboardingGuide = document.getElementById('onboarding-guide') as HTMLDivElement;
+const emptyState = document.getElementById('empty-state') as HTMLDivElement;
+const emptyStateTitle = document.getElementById('empty-state-title') as HTMLDivElement;
+const emptyStateDescription = document.getElementById('empty-state-description') as HTMLParagraphElement;
+const emptyStateAction = document.getElementById('empty-state-action') as HTMLButtonElement;
 const taskList = document.getElementById('task-list') as HTMLUListElement;
 const taskStatus = document.getElementById('task-status') as HTMLDivElement;
 const focusContainer = document.getElementById('focus-container') as HTMLDivElement;
@@ -75,6 +80,10 @@ function setupI18n() {
     if (taskInputLabel) taskInputLabel.textContent = chrome.i18n.getMessage('taskInputLabel');
     if (taskInput) taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
     if (addButton) addButton.textContent = chrome.i18n.getMessage('addButton');
+    if (onboardingGuide) onboardingGuide.textContent = chrome.i18n.getMessage('onboardingGuide');
+    if (emptyStateTitle) emptyStateTitle.textContent = chrome.i18n.getMessage('emptyStateTitle');
+    if (emptyStateDescription) emptyStateDescription.textContent = chrome.i18n.getMessage('emptyStateDescription');
+    if (emptyStateAction) emptyStateAction.textContent = chrome.i18n.getMessage('emptyStateAction');
 
     if (upgradeLink) upgradeLink.textContent = chrome.i18n.getMessage('upgradeButton');
     const themeLabel = document.getElementById('theme-label');
@@ -183,6 +192,9 @@ function setTaskStatus(tasks: Task[]) {
 function renderTasks(tasks: Task[]) {
     taskList.innerHTML = '';
     setTaskStatus(tasks);
+    const isEmpty = tasks.length === 0;
+    onboardingGuide.hidden = !isEmpty;
+    emptyState.hidden = !isEmpty;
     const focusedTask = tasks.find(t => t.focused);
     if (focusedTask && !focusedTask.completed) {
         focusContainer.style.display = 'block';
@@ -384,6 +396,10 @@ async function addTask() {
 taskEntryForm.addEventListener('submit', (event) => {
     event.preventDefault();
     void addTask();
+});
+
+emptyStateAction.addEventListener('click', () => {
+    taskInput.focus();
 });
 
 themeColorInput.addEventListener('change', () => {
