@@ -11,11 +11,59 @@ import {
     type Task,
 } from './core/tasks';
 import { createChromeTodoStorage } from './storage/chromeTodoStorage';
-import type { TodoStorageAdapter } from './storage/todoStorage';
+import { TODO_STORAGE_KEYS, type TodoStorageAdapter } from './storage/todoStorage';
 
 type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
 type TaskFocusControl = TaskControl | 'item';
 type TaskStatusState = 'loading' | 'empty' | 'active' | 'complete';
+type I18nMessageName =
+    | 'addButton'
+    | 'allTasksComplete'
+    | 'clearFocusTaskButtonForTask'
+    | 'deleteButton'
+    | 'deleteTaskButtonForTask'
+    | 'emptyStateAction'
+    | 'emptyStateDescription'
+    | 'emptyStateStepInput'
+    | 'emptyStateStepReturn'
+    | 'emptyStateTitle'
+    | 'emptyTasks'
+    | 'focusLabel'
+    | 'focusTaskButtonForTask'
+    | 'historyEmpty'
+    | 'historyItem'
+    | 'historyListLabel'
+    | 'historyTitle'
+    | 'inputPlaceholder'
+    | 'loadingTasks'
+    | 'markTaskComplete'
+    | 'markTaskIncomplete'
+    | 'moveTaskDownForTask'
+    | 'moveTaskUpForTask'
+    | 'onboardingGuide'
+    | 'premiumActive'
+    | 'premiumGate'
+    | 'premiumGateOneDay'
+    | 'taskCountPlural'
+    | 'taskCountSingular'
+    | 'taskInputLabel'
+    | 'taskListLabel'
+    | 'tasksRemainingStatus'
+    | 'themeLabel'
+    | 'title'
+    | 'upgradeButton';
+type TaskTextMessageName =
+    | 'clearFocusTaskButtonForTask'
+    | 'deleteTaskButtonForTask'
+    | 'focusTaskButtonForTask'
+    | 'markTaskComplete'
+    | 'markTaskIncomplete'
+    | 'moveTaskDownForTask'
+    | 'moveTaskUpForTask';
+type HtmlElementConstructor<T extends HTMLElement> = {
+    new(): T;
+    readonly name: string;
+};
 type PendingFocusTarget =
     | { type: 'task'; control: TaskFocusControl; index: number }
     | { type: 'input' };
@@ -24,42 +72,45 @@ let pendingFocusTarget: PendingFocusTarget | null = null;
 type SupportedLocale = 'ja' | 'en';
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
 
-function getRequiredElement<T extends HTMLElement>(id: string): T {
+function getRequiredElement<T extends HTMLElement>(
+    id: string,
+    elementType: HtmlElementConstructor<T>,
+): T {
     const element = document.getElementById(id);
-    if (!element) {
-        throw new Error(`Missing required element: #${id}`);
+    if (!(element instanceof elementType)) {
+        throw new Error(`Missing required element: #${id} (${elementType.name})`);
     }
 
-    return element as T;
+    return element;
 }
 
-const title = getRequiredElement<HTMLHeadingElement>('title');
-const taskEntryForm = getRequiredElement<HTMLFormElement>('task-entry');
-const taskInputLabel = getRequiredElement<HTMLLabelElement>('task-input-label');
-const taskInput = getRequiredElement<HTMLInputElement>('task-input');
-const addButton = getRequiredElement<HTMLButtonElement>('add-button');
-const onboardingGuide = getRequiredElement<HTMLDivElement>('onboarding-guide');
-const emptyState = getRequiredElement<HTMLDivElement>('empty-state');
-const emptyStateTitle = getRequiredElement<HTMLDivElement>('empty-state-title');
-const emptyStateDescription = getRequiredElement<HTMLParagraphElement>('empty-state-description');
-const emptyStateStepInput = getRequiredElement<HTMLLIElement>('empty-state-step-input');
-const emptyStateStepReturn = getRequiredElement<HTMLLIElement>('empty-state-step-return');
-const emptyStateAction = getRequiredElement<HTMLButtonElement>('empty-state-action');
-const taskList = getRequiredElement<HTMLUListElement>('task-list');
-const taskStatus = getRequiredElement<HTMLDivElement>('task-status');
-const focusContainer = getRequiredElement<HTMLDivElement>('focus-container');
-const focusLabel = getRequiredElement<HTMLDivElement>('focus-label');
-const focusText = getRequiredElement<HTMLDivElement>('focus-text');
-const premiumGate = getRequiredElement<HTMLDivElement>('premium-gate');
-const gateMessage = getRequiredElement<HTMLSpanElement>('gate-message');
-const upgradeLink = getRequiredElement<HTMLAnchorElement>('upgrade-link');
-const premiumFeatures = getRequiredElement<HTMLDivElement>('premium-features');
-const premiumStatus = getRequiredElement<HTMLDivElement>('premium-status');
-const themeLabel = getRequiredElement<HTMLLabelElement>('theme-label');
-const themeColorInput = getRequiredElement<HTMLInputElement>('theme-color');
-const historyTitle = getRequiredElement<HTMLDivElement>('history-title');
-const historyList = getRequiredElement<HTMLUListElement>('history-list');
-const historyStatus = getRequiredElement<HTMLDivElement>('history-status');
+const title = getRequiredElement('title', HTMLHeadingElement);
+const taskEntryForm = getRequiredElement('task-entry', HTMLFormElement);
+const taskInputLabel = getRequiredElement('task-input-label', HTMLLabelElement);
+const taskInput = getRequiredElement('task-input', HTMLInputElement);
+const addButton = getRequiredElement('add-button', HTMLButtonElement);
+const onboardingGuide = getRequiredElement('onboarding-guide', HTMLDivElement);
+const emptyState = getRequiredElement('empty-state', HTMLDivElement);
+const emptyStateTitle = getRequiredElement('empty-state-title', HTMLDivElement);
+const emptyStateDescription = getRequiredElement('empty-state-description', HTMLParagraphElement);
+const emptyStateStepInput = getRequiredElement('empty-state-step-input', HTMLLIElement);
+const emptyStateStepReturn = getRequiredElement('empty-state-step-return', HTMLLIElement);
+const emptyStateAction = getRequiredElement('empty-state-action', HTMLButtonElement);
+const taskList = getRequiredElement('task-list', HTMLUListElement);
+const taskStatus = getRequiredElement('task-status', HTMLDivElement);
+const focusContainer = getRequiredElement('focus-container', HTMLDivElement);
+const focusLabel = getRequiredElement('focus-label', HTMLDivElement);
+const focusText = getRequiredElement('focus-text', HTMLDivElement);
+const premiumGate = getRequiredElement('premium-gate', HTMLDivElement);
+const gateMessage = getRequiredElement('gate-message', HTMLSpanElement);
+const upgradeLink = getRequiredElement('upgrade-link', HTMLAnchorElement);
+const premiumFeatures = getRequiredElement('premium-features', HTMLDivElement);
+const premiumStatus = getRequiredElement('premium-status', HTMLDivElement);
+const themeLabel = getRequiredElement('theme-label', HTMLLabelElement);
+const themeColorInput = getRequiredElement('theme-color', HTMLInputElement);
+const historyTitle = getRequiredElement('history-title', HTMLDivElement);
+const historyList = getRequiredElement('history-list', HTMLUListElement);
+const historyStatus = getRequiredElement('history-status', HTMLDivElement);
 
 function getSupportedLocale(): SupportedLocale {
     const uiLocale = chrome.i18n.getMessage('@@ui_locale') || chrome.i18n.getUILanguage();
@@ -97,15 +148,19 @@ function formatNumber(value: number): string {
     return numberFormatter.format(value);
 }
 
-function i18nMessage(messageName: string, replacements: Record<string, string> = {}): string {
+function getMessage(messageName: I18nMessageName): string {
+    return chrome.i18n.getMessage(messageName);
+}
+
+function i18nMessage(messageName: I18nMessageName, replacements: Record<string, string> = {}): string {
     return Object.entries(replacements).reduce(
         (message, [key, value]) => message.replace(`$${key}$`, value),
-        chrome.i18n.getMessage(messageName),
+        getMessage(messageName),
     );
 }
 
-function setLocalizedText(element: HTMLElement, messageName: string) {
-    element.textContent = chrome.i18n.getMessage(messageName);
+function setLocalizedText(element: HTMLElement, messageName: I18nMessageName) {
+    element.textContent = getMessage(messageName);
 }
 
 function setTaskStatusMessage(message: string, state: TaskStatusState) {
@@ -115,11 +170,11 @@ function setTaskStatusMessage(message: string, state: TaskStatusState) {
 
 function setupI18n() {
     document.documentElement.lang = supportedLocale;
-    document.title = chrome.i18n.getMessage('title');
+    document.title = getMessage('title');
     setLocalizedText(title, 'title');
     setLocalizedText(focusLabel, 'focusLabel');
     setLocalizedText(taskInputLabel, 'taskInputLabel');
-    taskInput.placeholder = chrome.i18n.getMessage('inputPlaceholder');
+    taskInput.placeholder = getMessage('inputPlaceholder');
     setLocalizedText(addButton, 'addButton');
     setLocalizedText(onboardingGuide, 'onboardingGuide');
     setLocalizedText(emptyStateTitle, 'emptyStateTitle');
@@ -129,25 +184,25 @@ function setupI18n() {
     setLocalizedText(emptyStateAction, 'emptyStateAction');
     setLocalizedText(upgradeLink, 'upgradeButton');
     setLocalizedText(themeLabel, 'themeLabel');
-    themeColorInput.setAttribute('aria-label', chrome.i18n.getMessage('themeLabel'));
-    taskList.setAttribute('aria-label', chrome.i18n.getMessage('taskListLabel'));
+    themeColorInput.setAttribute('aria-label', getMessage('themeLabel'));
+    taskList.setAttribute('aria-label', getMessage('taskListLabel'));
     setLocalizedText(historyTitle, 'historyTitle');
-    historyList.setAttribute('aria-label', chrome.i18n.getMessage('historyListLabel'));
+    historyList.setAttribute('aria-label', getMessage('historyListLabel'));
     setLocalizedText(premiumStatus, 'premiumActive');
-    setTaskStatusMessage(chrome.i18n.getMessage('loadingTasks'), 'loading');
+    setTaskStatusMessage(getMessage('loadingTasks'), 'loading');
     taskList.setAttribute('aria-busy', 'true');
 }
 
-function taskMessage(messageName: string, taskText: string): string {
+function taskMessage(messageName: TaskTextMessageName, taskText: string): string {
     return i18nMessage(messageName, { TASK: taskText });
 }
 
 function taskCountLabel(count: number): string {
     if (supportedLocale === 'en') {
-        return chrome.i18n.getMessage(count === 1 ? 'taskCountSingular' : 'taskCountPlural');
+        return getMessage(count === 1 ? 'taskCountSingular' : 'taskCountPlural');
     }
 
-    return chrome.i18n.getMessage('taskCountPlural');
+    return getMessage('taskCountPlural');
 }
 
 function queueTaskFocus(control: TaskFocusControl, index: number) {
@@ -193,7 +248,7 @@ function renderHistory(history: HistoryItem[]) {
     historyList.innerHTML = '';
     if (history.length === 0) {
         historyStatus.hidden = false;
-        historyStatus.textContent = chrome.i18n.getMessage('historyEmpty');
+        historyStatus.textContent = getMessage('historyEmpty');
         return;
     }
 
@@ -226,13 +281,13 @@ function updatePremiumUI(isPremium: boolean, trialStartTs: number) {
 
 function setTaskStatus(tasks: Task[]) {
     if (tasks.length === 0) {
-        setTaskStatusMessage(chrome.i18n.getMessage('emptyTasks'), 'empty');
+        setTaskStatusMessage(getMessage('emptyTasks'), 'empty');
         return;
     }
 
     const remaining = tasks.filter(task => !task.completed).length;
     if (remaining === 0) {
-        setTaskStatusMessage(chrome.i18n.getMessage('allTasksComplete'), 'complete');
+        setTaskStatusMessage(getMessage('allTasksComplete'), 'complete');
         return;
     }
 
@@ -258,7 +313,7 @@ interface MoveTaskButtonOptions {
     direction: -1 | 1;
     control: 'move-up' | 'move-down';
     textContent: string;
-    messageName: 'moveTaskUpForTask' | 'moveTaskDownForTask';
+    messageName: Extract<TaskTextMessageName, 'moveTaskUpForTask' | 'moveTaskDownForTask'>;
     disabled: boolean;
 }
 
@@ -361,7 +416,7 @@ function renderTasks(tasks: Task[]) {
 
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
-        deleteButton.textContent = chrome.i18n.getMessage('deleteButton');
+        deleteButton.textContent = getMessage('deleteButton');
         deleteButton.className = 'delete-button';
         deleteButton.setAttribute('aria-label', taskMessage('deleteTaskButtonForTask', task.text));
         setTaskControlAttributes(deleteButton, 'delete', index);
@@ -388,7 +443,7 @@ function renderTasks(tasks: Task[]) {
 }
 
 async function loadTasks() {
-    const result = await todoStorage.get(['tasks', 'last_date', 'trial_start_ts', 'is_premium', 'history', 'theme']);
+    const result = await todoStorage.get(TODO_STORAGE_KEYS);
     const today = getTodayString();
     const lastDate = result.last_date;
     let trialStartTs = result.trial_start_ts;
