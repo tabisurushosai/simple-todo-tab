@@ -1,3 +1,24 @@
-{ "name":"simple-todo-tab","version":"0.1.0","private":true,"type":"module",
-  "scripts":{"dev":"vite build --watch","build":"tsc --noEmit && vite build && cp manifest.json dist/ && cp -r icons dist/ && cp -r _locales dist/","zip":"mkdir -p release && cd dist && zip -r ../release/simple-todo-tab.zip .","lint":"eslint . --ext .ts,.tsx || true","test":"vitest","test:run":"vitest run","test:watch":"vitest"},
-  "devDependencies":{"typescript":"^5.5.4","vite":"^5.4.0","@types/chrome":"^0.0.270"} }
+{
+  "name": "simple-todo-tab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc --noEmit && vite build && cp manifest.json dist/ && cp -r icons dist/ && cp -r _locales dist/",
+    "zip": "mkdir -p release && cd dist && zip -r ../release/simple-todo-tab.zip .",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/chrome": "^0.0.270",
+    "eslint": "^10.4.0",
+    "globals": "^17.6.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.59.4",
+    "vite": "^5.4.0"
+  }
+}

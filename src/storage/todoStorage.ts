@@ -9,6 +9,8 @@ export interface TodoStorageValues {
     theme?: string;
 }
 
+export type TodoStorageKey = keyof TodoStorageValues;
+
 export const TODO_STORAGE_KEYS = [
     'tasks',
     'last_date',
@@ -16,9 +18,8 @@ export const TODO_STORAGE_KEYS = [
     'is_premium',
     'history',
     'theme',
-] as const;
+] as const satisfies readonly TodoStorageKey[];
 
-export type TodoStorageKey = keyof TodoStorageValues;
 export interface TodoStorageChange<T = unknown> {
     oldValue?: T;
     newValue?: T;
