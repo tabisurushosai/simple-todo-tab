@@ -65,13 +65,31 @@ function getSupportedLocale(): SupportedLocale {
 }
 
 const supportedLocale = getSupportedLocale();
-const numberFormatter = new Intl.NumberFormat(supportedLocale);
-const historyDateFormatter = new Intl.DateTimeFormat(supportedLocale, {
-    month: 'numeric',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-});
+
+function getLocaleTag(locale: SupportedLocale): string {
+    return locale === 'en' ? 'en-US' : 'ja-JP';
+}
+
+const localeTag = getLocaleTag(supportedLocale);
+const numberFormatter = new Intl.NumberFormat(localeTag);
+const historyDateFormatOptions: Intl.DateTimeFormatOptions = supportedLocale === 'en'
+    ? {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    }
+    : {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+    };
+const historyDateFormatter = new Intl.DateTimeFormat(localeTag, historyDateFormatOptions);
 
 function formatNumber(value: number): string {
     return numberFormatter.format(value);
@@ -118,6 +136,14 @@ function setupI18n() {
 
 function taskMessage(messageName: string, taskText: string): string {
     return i18nMessage(messageName, { TASK: taskText });
+}
+
+function taskCountLabel(count: number): string {
+    if (supportedLocale === 'en') {
+        return chrome.i18n.getMessage(count === 1 ? 'taskCountSingular' : 'taskCountPlural');
+    }
+
+    return chrome.i18n.getMessage('taskCountPlural');
 }
 
 function queueTaskFocus(control: TaskFocusControl, index: number) {
@@ -207,9 +233,12 @@ function setTaskStatus(tasks: Task[]) {
     }
 
     setTaskStatusMessage(
-        chrome.i18n.getMessage('tasksRemainingStatus')
-            .replace('$ACTIVE$', formatNumber(remaining))
-            .replace('$TOTAL$', formatNumber(tasks.length)),
+        i18nMessage('tasksRemainingStatus', {
+            ACTIVE: formatNumber(remaining),
+            ACTIVE_TASK_LABEL: taskCountLabel(remaining),
+            TOTAL: formatNumber(tasks.length),
+            TOTAL_TASK_LABEL: taskCountLabel(tasks.length),
+        }),
         'active',
     );
 }
