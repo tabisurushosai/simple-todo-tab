@@ -21,6 +21,7 @@ import { TODO_STORAGE_KEYS, type TodoStorageAdapter } from './storage/todoStorag
 type TaskControl = 'checkbox' | 'focus' | 'move-up' | 'move-down' | 'delete';
 type TaskFocusControl = TaskControl | 'item';
 type TaskStatusState = 'loading' | 'empty' | 'active' | 'complete';
+type TaskNavigationKey = typeof taskNavigationKeys[number];
 type I18nMessageName =
     | 'addButton'
     | 'allTasksComplete'
@@ -78,6 +79,10 @@ let pendingFocusTarget: PendingFocusTarget | null = null;
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
 const taskControls = ['checkbox', 'focus', 'move-up', 'move-down', 'delete'] as const satisfies readonly TaskControl[];
 const taskNavigationKeys = ['ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
+
+function isStringInList<T extends string>(values: readonly T[], value: string | undefined): value is T {
+    return value !== undefined && (values as readonly string[]).includes(value);
+}
 
 function getRequiredElement<T extends HTMLElement>(
     id: string,
@@ -237,11 +242,11 @@ function focusPendingTarget() {
 }
 
 function isTaskControl(value: string | undefined): value is TaskControl {
-    return taskControls.includes(value as TaskControl);
+    return isStringInList(taskControls, value);
 }
 
-function isTaskNavigationKey(value: string): value is typeof taskNavigationKeys[number] {
-    return taskNavigationKeys.includes(value as typeof taskNavigationKeys[number]);
+function isTaskNavigationKey(value: string): value is TaskNavigationKey {
+    return isStringInList(taskNavigationKeys, value);
 }
 
 function getTaskIndexFromElement(element: HTMLElement): number | null {
@@ -260,7 +265,7 @@ function getTaskControlFromElement(element: HTMLElement): TaskFocusControl {
     return isTaskControl(control) ? control : 'item';
 }
 
-function getKeyboardTargetIndex(key: typeof taskNavigationKeys[number], currentIndex: number, taskCount: number): number {
+function getKeyboardTargetIndex(key: TaskNavigationKey, currentIndex: number, taskCount: number): number {
     switch (key) {
         case 'ArrowUp':
             return Math.max(0, currentIndex - 1);
