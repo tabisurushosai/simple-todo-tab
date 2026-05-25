@@ -7,6 +7,7 @@ export interface TodoStorageValues {
     is_premium?: boolean;
     history?: HistoryItem[];
     theme?: string;
+    has_seen_onboarding?: boolean;
 }
 
 export type TodoStorageKey = keyof TodoStorageValues;
@@ -18,6 +19,7 @@ export const TODO_STORAGE_KEYS = [
     'is_premium',
     'history',
     'theme',
+    'has_seen_onboarding',
 ] as const satisfies readonly TodoStorageKey[];
 
 export function isTodoStorageKey(key: string): key is TodoStorageKey {

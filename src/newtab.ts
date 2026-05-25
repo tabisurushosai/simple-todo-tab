@@ -83,6 +83,7 @@ type PendingFocusTarget =
     | { type: 'input' };
 
 let pendingFocusTarget: PendingFocusTarget | null = null;
+let hasSeenOnboarding = false;
 const todoStorage: TodoStorageAdapter = createChromeTodoStorage();
 
 function isStringInList<T extends string>(values: readonly T[], value: string | undefined): value is T {
@@ -229,6 +230,13 @@ function queueTaskFocus(control: TaskFocusControl, index: number) {
 
 function queueInputFocus() {
     pendingFocusTarget = { type: 'input' };
+}
+
+function markOnboardingSeen() {
+    if (hasSeenOnboarding) return;
+
+    hasSeenOnboarding = true;
+    void todoStorage.set({ has_seen_onboarding: true });
 }
 
 function getTaskFocusSelectors(target: { control: TaskFocusControl; index: number }): string[] {
@@ -468,9 +476,13 @@ function renderTasks(tasks: Task[]) {
     taskList.setAttribute('aria-busy', 'false');
     setTaskStatus(tasks);
     const isEmpty = tasks.length === 0;
-    onboardingGuide.hidden = !isEmpty;
+    onboardingGuide.hidden = !isEmpty || hasSeenOnboarding;
     emptyState.hidden = !isEmpty;
-    const taskEntryDescription = isEmpty ? 'onboarding-guide task-status' : 'task-status';
+    const taskEntryDescription = isEmpty
+        ? hasSeenOnboarding
+            ? 'empty-state-description task-status'
+            : 'onboarding-guide empty-state-description task-status'
+        : 'task-status';
     taskEntryForm.setAttribute('aria-describedby', taskEntryDescription);
     taskInput.setAttribute('aria-describedby', taskEntryDescription);
     const focusedTask = tasks.find(t => t.focused);
@@ -583,6 +595,7 @@ async function loadTasks() {
     const isPremium = !!result.is_premium;
     const history = result.history || [];
     const theme = result.theme || '#f0f2f5';
+    hasSeenOnboarding = !!result.has_seen_onboarding;
 
     if (!trialStartTs) {
         trialStartTs = Date.now();
@@ -597,6 +610,9 @@ async function loadTasks() {
     }
 
     let tasks = normalizeTasks(result.tasks);
+    if (tasks.length > 0) {
+        markOnboardingSeen();
+    }
 
     if (lastDate && lastDate !== today) {
         // Date changed: carry over incomplete, reset completed
@@ -664,7 +680,8 @@ async function addTask() {
     const result = await todoStorage.get(['tasks']);
     const tasks = normalizeTasks(result.tasks);
     const newTasks: Task[] = [...tasks, createTask(text)];
-    await todoStorage.set({ tasks: newTasks });
+    hasSeenOnboarding = true;
+    await todoStorage.set({ tasks: newTasks, has_seen_onboarding: true });
     taskInput.value = '';
     renderTasks(newTasks);
 }
