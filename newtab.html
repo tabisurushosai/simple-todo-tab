@@ -18,24 +18,24 @@
 
             <form id="task-entry" class="task-entry" aria-describedby="task-status">
                 <label id="task-input-label" class="visually-hidden" for="task-input">今日やることの入力欄</label>
-                <input type="text" id="task-input" class="task-input" placeholder="何をしますか？" autocomplete="off" aria-labelledby="task-input-label">
+                <input type="text" id="task-input" class="task-input" placeholder="今日やることは？" autocomplete="off" aria-labelledby="task-input-label">
                 <button id="add-button" class="add-button" type="submit" aria-controls="task-list">追加</button>
             </form>
 
-            <div id="onboarding-guide" class="onboarding-guide" role="note" hidden>はじめてなら、今日やることを1つだけ入力して追加しましょう。</div>
+            <div id="onboarding-guide" class="onboarding-guide" role="note" hidden>はじめてなら、今日やることを1つだけ書いて追加しましょう。</div>
             <div id="empty-state" class="empty-state" hidden>
                 <div id="empty-state-title" class="empty-state-title">まだやることはありません</div>
-                <p id="empty-state-description" class="empty-state-description">今日やることを短く書くと、このタブがシンプルなチェックリストになります。</p>
+                <p id="empty-state-description" class="empty-state-description">今日やることを短く書くだけで、このタブをシンプルなチェックリストとして使えます。</p>
                 <p id="empty-state-example" class="empty-state-example">迷ったら「10分だけ片づける」のように、小さな1つから始めましょう。</p>
                 <ul class="empty-state-steps">
                     <li id="empty-state-step-input">入力欄に、今思い浮かぶことを1つ書きます。</li>
-                    <li id="empty-state-step-return">追加後は、新しいタブを開くたびに確認できます。</li>
+                    <li id="empty-state-step-return">追加すると、新しいタブを開くたびに確認できます。</li>
                 </ul>
                 <button id="empty-state-action" class="empty-state-action" type="button" aria-controls="task-input">入力欄に移動</button>
             </div>
 
             <div id="task-status" class="status-message" role="status" aria-live="polite" aria-atomic="true">読み込み中...</div>
-            <p id="task-keyboard-help" class="visually-hidden">Tabキーでタスク操作に移動し、上下矢印キーでタスク間、左右矢印キーで同じタスク内の操作を移動できます。</p>
+            <p id="task-keyboard-help" class="visually-hidden">Tabキーでタスク操作へ移動し、上下矢印キーでタスク間、左右矢印キーで同じタスク内の操作間を移動できます。</p>
             <ul id="task-list" class="task-list" aria-describedby="task-status task-keyboard-help"></ul>
 
             <hr class="section-divider">
@@ -43,7 +43,7 @@
             <div id="premium-section" class="premium-section">
                 <div id="premium-gate" class="premium-gate">
                     <span id="gate-message"></span>
-                    <a id="upgrade-link" class="upgrade-link" href="https://checkout.stripe.com/c/dummy" target="_blank">プレミアムにアップグレード</a>
+                    <a id="upgrade-link" class="upgrade-link" href="https://checkout.stripe.com/c/dummy" target="_blank">プレミアムへアップグレード</a>
                 </div>
 
                 <div id="premium-features" class="premium-features">

@@ -1,24 +1,24 @@
 {
   "extName": { "message": "Just Today" },
   "extDesc": { "message": "Shows only today's tasks on every new tab, helping you focus on one thing now." },
-  "title": { "message": "Today's tasks" },
-  "focusLabel": { "message": "Current focus" },
-  "taskInputLabel": { "message": "Today's task" },
+  "title": { "message": "Today's to-dos" },
+  "focusLabel": { "message": "Focus now" },
+  "taskInputLabel": { "message": "Task to add for today" },
   "inputPlaceholder": { "message": "What will you do today?" },
   "addButton": { "message": "Add" },
-  "onboardingGuide": { "message": "Start by adding one thing you want to do today." },
+  "onboardingGuide": { "message": "Start by adding just one thing for today." },
   "emptyStateTitle": { "message": "No tasks yet" },
-  "emptyStateDescription": { "message": "Add a short task for today, and this tab becomes a simple checklist." },
+  "emptyStateDescription": { "message": "Write a short task for today, and this tab becomes a simple checklist." },
   "emptyStateExample": { "message": "Not sure what to write? Start small, like \"Tidy for 10 minutes.\"" },
-  "emptyStateStepInput": { "message": "Type one thing that comes to mind." },
-  "emptyStateStepReturn": { "message": "After you add it, every new tab will show it." },
+  "emptyStateStepInput": { "message": "Type one thing that comes to mind right now." },
+  "emptyStateStepReturn": { "message": "Once added, it appears whenever you open a new tab." },
   "emptyStateAction": { "message": "Go to task input" },
   "deleteButton": { "message": "Delete" },
   "loadingTasks": { "message": "Loading tasks..." },
   "emptyTasks": { "message": "No tasks yet. Add one thing to do today." },
   "allTasksComplete": { "message": "Everything for today is complete. Nice work." },
   "tasksRemainingStatus": {
-    "message": "$ACTIVE$ $ACTIVE_TASK_LABEL$ left / $TOTAL$ $TOTAL_TASK_LABEL$ total",
+    "message": "$ACTIVE$ $ACTIVE_TASK_LABEL$ remaining / $TOTAL$ $TOTAL_TASK_LABEL$ total",
     "placeholders": {
       "active": { "content": "$1" },
       "active_task_label": { "content": "$2" },
@@ -28,7 +28,7 @@
   },
   "taskCountSingular": { "message": "task" },
   "taskCountPlural": { "message": "tasks" },
-  "taskKeyboardHelp": { "message": "Use Tab to reach task controls, Up and Down arrows to move between tasks, and Left and Right arrows to move between controls for the same task." },
+  "taskKeyboardHelp": { "message": "Use Tab to reach task controls. Use Up/Down to move between tasks and Left/Right to move between controls for the same task." },
   "taskListLabel": { "message": "Today's task list" },
   "markTaskComplete": {
     "message": "Mark as complete: $TASK$",
@@ -59,25 +59,25 @@
     "placeholders": { "task": { "content": "$1" } }
   },
   "premiumGate": {
-    "message": "Trial has $DAYS$ days left. Upgrade to Premium for a custom background color and completion history.",
+    "message": "Your trial has $DAYS$ days left. Upgrade to Premium to customize the background color and keep completion history.",
     "placeholders": { "days": { "content": "$1" } }
   },
   "premiumGateOneDay": {
-    "message": "Trial has $DAYS$ day left. Upgrade to Premium for a custom background color and completion history.",
+    "message": "Your trial has $DAYS$ day left. Upgrade to Premium to customize the background color and keep completion history.",
     "placeholders": { "days": { "content": "$1" } }
   },
-  "premiumGateExpired": { "message": "Trial has ended. Upgrade to Premium for a custom background color and completion history." },
+  "premiumGateExpired": { "message": "Your trial has ended. Upgrade to Premium to customize the background color and keep completion history." },
   "upgradeButton": { "message": "Upgrade to Premium" },
   "themeLabel": { "message": "Background color" },
   "historyTitle": { "message": "Completion history" },
   "historyListLabel": { "message": "Completion history list" },
   "historyEmpty": { "message": "No completion history yet." },
   "historyItem": {
-    "message": "$DATE$: $TASK$",
+    "message": "$DATE$ - $TASK$",
     "placeholders": {
       "date": { "content": "$1" },
       "task": { "content": "$2" }
     }
   },
-  "premiumActive": { "message": "Premium is active" }
+  "premiumActive": { "message": "Premium active" }
 }
