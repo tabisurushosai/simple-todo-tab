@@ -181,7 +181,7 @@ function setLocalizedText(element: HTMLElement, messageName: I18nMessageName) {
 
 function setTaskStatusMessage(message: string, state: TaskStatusState) {
     taskStatus.textContent = message;
-    taskStatus.dataset.state = state;
+    taskStatus.dataset['state'] = state;
 }
 
 function setupI18n() {
@@ -293,7 +293,7 @@ function isTaskVerticalNavigationKey(value: TaskNavigationKey): value is TaskVer
 
 function getTaskIndexFromElement(element: HTMLElement): number | null {
     const taskElement = element.closest<HTMLElement>('li[data-task-index]');
-    const rawIndex = taskElement?.dataset.taskIndex;
+    const rawIndex = taskElement?.dataset['taskIndex'];
     if (rawIndex === undefined) {
         return null;
     }
@@ -303,7 +303,7 @@ function getTaskIndexFromElement(element: HTMLElement): number | null {
 }
 
 function getTaskControlFromElement(element: HTMLElement): TaskFocusControl {
-    const control = element.dataset.taskControl;
+    const control = element.dataset['taskControl'];
     return isTaskControl(control) ? control : 'item';
 }
 

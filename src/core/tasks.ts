@@ -60,19 +60,17 @@ export function deleteTaskAt(tasks: readonly Task[], index: number): Task[] {
 }
 
 export function toggleTaskCompletion(tasks: readonly Task[], index: number): ToggleTaskCompletionResult | null {
-    if (!tasks[index]) {
+    const targetTask = tasks[index];
+    if (!targetTask) {
         return null;
     }
 
+    const updatedTask = { ...targetTask, completed: !targetTask.completed };
     const nextTasks = tasks.map((task, taskIndex) => (
         taskIndex === index
-            ? { ...task, completed: !task.completed }
+            ? updatedTask
             : task
     ));
-    const updatedTask = nextTasks[index];
-    if (!updatedTask) {
-        return null;
-    }
 
     return updatedTask.completed
         ? { tasks: nextTasks, completedTask: updatedTask }
